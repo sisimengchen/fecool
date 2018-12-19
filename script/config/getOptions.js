@@ -6,7 +6,7 @@ const { isURL, isPath, isRelativePath, printer } = require("../util");
 class Options {
   constructor(options) {
     this.__options = options;
-    // console.log(options);
+    console.log("用户配置:", options);
     this.process(options);
   }
 
@@ -148,13 +148,13 @@ class Options {
    */
   getURL(source = "nosource") {
     if (isURL(source)) {
-      console.log(1);
+      // console.log(1);
       return source;
     } else if (isPath(source)) {
-      console.log(2);
+      // console.log(2);
       return `${this.publicPath}/${path.relative(this.sourceDir, source)}`;
     } else {
-      console.log(3);
+      // console.log(3);
       return source;
     }
   }

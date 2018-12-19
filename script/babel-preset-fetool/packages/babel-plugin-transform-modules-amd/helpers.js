@@ -1,38 +1,38 @@
 "use strict";
 const path = require("path");
 
-const { printer } = require("../util");
+const { printer } = require("../../../util");
 
 const rules = [
   {
     name: "image-loader",
     test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-    loader: require("../loader/image-loader"),
+    loader: require("../../../loader/image-loader"),
     options: {}
   },
   {
     name: "template-loader",
     test: /\.tmpl$/,
-    loader: require("../loader/template-loader"),
+    loader: require("../../../loader/template-loader"),
     options: {}
   },
   {
     name: "json-loader",
     test: /\.json$/,
-    loader: require("../loader/json-loader"),
+    loader: require("../../../loader/json-loader"),
     options: {}
   },
   {
     name: "style-loader",
     test: /\.css$/,
-    loader: require("../loader/style-loader"),
+    loader: require("../../../loader/style-loader"),
     options: {}
   }
 ];
 
 const defaultRule = {
   name: "default-loader",
-  loader: require("../loader/default-loader"),
+  loader: require("../../../loader/default-loader"),
   options: {}
 };
 
@@ -56,7 +56,7 @@ module.exports = t => {
       return item.test && item.test.test && item.test.test(source);
     });
     if (!rule) {
-      isCode = true
+      isCode = true;
       rule = defaultRule;
     }
     printer.log(`执行加载器：${rule.name}`);
@@ -64,7 +64,7 @@ module.exports = t => {
       { name, source, filename: this.filename },
       rule.options
     );
-    result.isCode = isCode
+    result.isCode = isCode;
     // console.log(result)
     return result;
   };

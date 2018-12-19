@@ -3,28 +3,31 @@
  */
 module.exports = function(
   options = {
-    isOldJSEnabled: false,
-    isES6Enabled: false,
+    isCommonModules: false,
+    isES6Enabled: true,
     isReactEnabled: false
   }
 ) {
-  let { isOldJSEnabled, isES6Enabled, isReactEnabled } = options;
+  let { isCommonModules, isES6Enabled, isReactEnabled } = options;
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   return {
     presets: [
-      // [require('babel-preset-minify')],
+      [require("../babel-preset-fetool")],
       isES6Enabled && [
         require("@babel/preset-env").default,
         {
-          useBuiltIns: "entry", // "entry", //"entry",
+          useBuiltIns: "entry",
           targets: { browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"] },
-          modules: "amd",
+          // modules: isCommonModules ? false : "amd"
+          // modules: false,
+          modules: 'amd'
           // debug: true
         }
       ],
       isReactEnabled && [require("@babel/preset-react").default]
     ].filter(Boolean),
     plugins: [
+      [require("../babel-plugin-tinytool")],
       // isES6Enabled && [require('babel-plugin-transform-class-properties')],
       // isES6Enabled && [require('babel-plugin-transform-object-rest-spread')],
       // isES6Enabled && [require('babel-plugin-transform-export-extensions')],
@@ -36,9 +39,7 @@ module.exports = function(
           // polyfill: false,
           // regenerator: true
         }
-      ],
-      // isOldJSEnabled && [require("../babel-plugin-tinytool")],
-      // [require("../babel-plugin-transform-modules-amd")]
+      ]
     ].filter(Boolean)
   };
 };

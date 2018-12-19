@@ -11,12 +11,12 @@ const defaultOptions = {
     publicPath: ""
   },
   resolve: {
-    extensions: [".js", ".jsx", ".es6"],
+    extensions: [".js", ".jsx"],
     alias: {}
   },
   js: {
     lint: false,
-    types: ["js", "es6", "jsx"],
+    types: ["js", "jsx"],
     sourceMap: {
       active: false,
       inline: true

@@ -1,6 +1,8 @@
 const gulp = require("gulp");
 const gulpif = require("gulp-if");
 const babel = require("gulp-babel");
+const gulpmatch = require("gulp-match");
+const map = require("map-stream");
 const print = require("gulp-print").default;
 const cached = require("gulp-cached");
 const remember = require("gulp-remember");
@@ -11,21 +13,41 @@ const globalOptions = getOptions();
 
 module.exports = function() {
   globalOptions.js.types.forEach(type => {
-    // console.log(globalOptions.getGulpSrc(type, false, true))
-    // console.log(globalOptions.getGulpDest());
     gulp.task(`${type}:compile` /*, ['js:check']*/, done => {
       return (
         gulp
           .src(globalOptions.getGulpSrc(type, false, true))
-          // .pipe(cached(`${type}:compile`))
           .pipe(print(filepath => `${type}编译: ${filepath}`))
           .pipe(
-            babel(
-              getBabelOptions({
-                isOldJSEnabled: type == "js" ? true : false,
-                isES6Enabled: type == "es6" ? true : false,
-                isReactEnabled: type == "jsx" ? true : false
-              })
+            gulpif(
+              file => {
+                const { path } = file;
+                const isCommonModules = path.indexOf("common_modules") > -1;
+                return isCommonModules;
+              },
+              babel(
+                getBabelOptions({
+                  isCommonModules: true,
+                  isES6Enabled: true,
+                  isReactEnabled: type == "jsx" ? true : false
+                })
+              )
+            )
+          )
+          .pipe(
+            gulpif(
+              file => {
+                const { path } = file;
+                const isCommonModules = path.indexOf("common_modules") > -1;
+                return !isCommonModules;
+              },
+              babel(
+                getBabelOptions({
+                  isCommonModules: false,
+                  isES6Enabled: true,
+                  isReactEnabled: type == "jsx" ? true : false
+                })
+              )
             )
           )
           // .pipe(

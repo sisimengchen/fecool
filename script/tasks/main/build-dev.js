@@ -1,6 +1,7 @@
 const gulp = require("gulp");
 const getPackage = require("../../package");
 const runSequence = require("run-sequence").use(gulp);
+const { printer } = require("../../util");
 
 require("../other/move")();
 require("../css/compile-stylus")();
@@ -23,24 +24,17 @@ module.exports = function() {
       ],
       [
         "js:compile", // js编译
-        "es6:compile", // es6编译
+        // "es6:compile", // es6编译
         "jsx:compile" // jsx编译
       ],
       function() {
-        // console.log(getPackage().module);
-        // const allDependencies = [];
-        // getPackage().getDependenciesByName(
-        //   "/Users/mengchen/project/fetool/src/m/page/antd/app.js",
-        //   allDependencies
-        // );
-        // console.log("allDependencies", allDependencies);
-        getPackage().resovleDependencies();
-        getPackage().concatDependencies();
-        // console.log("dependenciesMap", getPackage().dependenciesMap);
-        // const dependenciesMap = getPackage().dependenciesMap;
-        // var concat = new Concat(false, "all.js", "\n");
-        // const keys =
-        console.log("over");
+        printer.log("gulp执行完毕");
+        printer.log("依赖打包开始");
+        // getPackage().resovleDependencies();
+        // console.log(getPackage().dependenciesMap);
+        // getPackage().concatDependencies();
+        printer.log("依赖打包结束");
+        printer.log("静态资源编译完成");
         cb && cb();
       }
     );

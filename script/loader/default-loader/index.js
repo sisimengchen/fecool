@@ -20,7 +20,6 @@ module.exports = function({ name, source, filename }, options = {}) {
     printer.error(error);
   } finally {
   }
-  console.log("resourcePath", resourcePath)
   return {
     acitve: true,
     name,

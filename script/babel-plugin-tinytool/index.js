@@ -85,9 +85,9 @@ module.exports = declare((api, options, dirname) => {
                   name === "__include" ||
                   name === "__includejson"
                 ) {
-                  const { arguments = [] } = init; // 获取require调用参数
-                  if (arguments.length) {
-                    let source = arguments[0].value; // 获取require调用第一个参数的值
+                  const args = init.arguments || []; // 获取require调用参数
+                  if (args.length) {
+                    let source = args[0].value; // 获取require调用第一个参数的值
                     if (name === "__include") {
                       source = `${source}.tmpl`;
                     } else if (name === "__includejson") {
@@ -109,9 +109,9 @@ module.exports = declare((api, options, dirname) => {
                   name === "__include" ||
                   name === "__includejson"
                 ) {
-                  const { arguments = [] } = init.callee; // 获取require调用参数
-                  if (arguments.length) {
-                    let source = arguments[0].value; // 获取require调用第一个参数的值
+                  const args = init.arguments || []; // 获取require调用参数
+                  if (args.length) {
+                    let source = args[0].value; // 获取require调用第一个参数的值
                     if (name === "__include") {
                       source = `${source}.tmpl`;
                     } else if (name === "__includejson") {
@@ -147,9 +147,9 @@ module.exports = declare((api, options, dirname) => {
                 name === "__include" ||
                 name === "__includejson"
               ) {
-                const { arguments = [] } = init.object; // 获取require调用参数
-                if (arguments.length) {
-                  let source = arguments[0].value; // 获取require调用第一个参数的值
+                const args = init.arguments || []; // 获取require调用参数
+                if (args.length) {
+                  let source = args[0].value; // 获取require调用第一个参数的值
                   if (name === "__include") {
                     source = `${source}.tmpl`;
                   } else if (name === "__includejson") {

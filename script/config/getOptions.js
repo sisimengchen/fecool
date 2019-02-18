@@ -16,7 +16,7 @@ class Options {
     this.init();
   }
 
-  init() {
+  init(options) {
     const { entry, output, resolve } = this.__options;
     this.mode = options.mode ? options.mode : "production";
     this.context = path.isAbsolute(options.context)
@@ -341,7 +341,7 @@ const getOptions = function(userOptions = {}) {
   if (instance) {
     return instance;
   } else {
-    options = Object.assign({}, require("./defaultOptions.js"), userOptions);
+    const options = Object.assign({}, require("./defaultOptions.js"), userOptions);
     printer.debug("启动配置", options);
     instance = new Options(options);
     return instance;

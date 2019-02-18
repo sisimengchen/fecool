@@ -1,12 +1,12 @@
 const gulp = require("gulp");
-const { getOptions } = require("../script/config");
-const { printer } = require("../script/util");
-const asciiArt = require("../script/util/asciiArt");
+const { getOptions } = require("../dist/config");
+const { printer } = require("../dist/util");
+const asciiArt = require("../dist/util/asciiArt");
 
 module.exports = function init() {
   asciiArt("fetool");
   const globalOptions = getOptions();
-  require("../script/tasks/main");
+  require("../dist/tasks/main");
   if (globalOptions.isWatch()) {
     gulp.start("main:watch");
   } else if (globalOptions.isDevelopENV()) {

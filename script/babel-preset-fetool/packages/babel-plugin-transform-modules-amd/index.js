@@ -44,42 +44,42 @@ module.exports = declare((api, options) => {
           const calleeName = node.callee.name;
           const isAmd = calleeName === REQUIRE || calleeName === DEFINE;
           if (!isAmd) return;
-          const { arguments = [, , ,] } = node;
+          const args = node.arguments || [, , ,];
           let deps, callback;
           // 解参数
           if (
             calleeName === DEFINE &&
-            arguments[0] &&
-            t.isStringLiteral(arguments[0]) // define调用，第一个参数是字符串 define('react', ...)
+            args[0] &&
+            t.isStringLiteral(args[0]) // define调用，第一个参数是字符串 define('react', ...)
           ) {
-            if (arguments[1] && t.isArrayExpression(arguments[1])) {
+            if (args[1] && t.isArrayExpression(args[1])) {
               // define调用，第一个参数是字符串 第二个参数是数组 define('react', [], function() {})
-              deps = arguments[1];
-              callback = arguments[2];
+              deps = args[1];
+              callback = args[2];
             } else {
               // define调用，第一个参数是字符串 第二个参数不是数组 define('react', function() {})
-              arguments[2] = arguments[1];
-              arguments[1] = t.arrayExpression();
-              deps = arguments[1];
-              callback = arguments[2];
+              args[2] = args[1];
+              args[1] = t.arrayExpression();
+              deps = args[1];
+              callback = args[2];
             }
           } else if (calleeName === DEFINE) {
-            arguments[2] = arguments[1];
-            arguments[1] = arguments[0];
-            // arguments[0] = t.stringLiteral("@fetool_temp_name"); // 生成一个临时的 moduleName后面处理会被替换掉
-            if (arguments[1] && t.isArrayExpression(arguments[1])) {
-              deps = arguments[1];
-              callback = arguments[2];
+            args[2] = args[1];
+            args[1] = args[0];
+            // args[0] = t.stringLiteral("@fetool_temp_name"); // 生成一个临时的 moduleName后面处理会被替换掉
+            if (args[1] && t.isArrayExpression(args[1])) {
+              deps = args[1];
+              callback = args[2];
             } else {
-              arguments[2] = arguments[1];
-              arguments[1] = t.arrayExpression();
-              deps = arguments[1];
-              callback = arguments[2];
+              args[2] = args[1];
+              args[1] = t.arrayExpression();
+              deps = args[1];
+              callback = args[2];
             }
           } else {
             // require
-            deps = arguments[0] ? arguments[0] : undefined;
-            callback = arguments[1] ? arguments[1] : undefined;
+            deps = args[0] ? args[0] : undefined;
+            callback = args[1] ? args[1] : undefined;
           }
 
           if (!deps || !callback) return;
@@ -93,7 +93,7 @@ module.exports = declare((api, options) => {
           const moduleName4Package = module.transformFilename;
           getPackage().addModule(moduleName4Package); // 把模块添加到打包列表中
           if (calleeName === DEFINE) {
-            arguments[0] = t.stringLiteral(module.url); // 定义为一个新的模块名称
+            args[0] = t.stringLiteral(module.url); // 定义为一个新的模块名称
           }
           if (t.isFunctionExpression(callback)) {
             // 如果callback是一个函数表达式，则解出params

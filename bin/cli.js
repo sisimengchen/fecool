@@ -3,8 +3,8 @@
 const info = require("../package.json");
 const program = require("commander");
 const path = require("path");
-const { getOptions } = require("../script/config");
-const { printer } = require("../script/util");
+const { getOptions } = require("../dist/config");
+const { printer } = require("../dist/util");
 const initServer = require("./server");
 const init = require("./build");
 

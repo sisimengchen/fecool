@@ -1,30 +1,47 @@
 /**
  * 获取Babel的配置
  */
+const getOptions = require("./getOptions");
+
 module.exports = function(
   options = {
-    isCommonModules: false,
+    isModule: false,
     isES6Enabled: true,
     isReactEnabled: false
   }
 ) {
-  let { isCommonModules, isES6Enabled, isReactEnabled } = options;
+  let { isModule, isES6Enabled, isReactEnabled } = options;
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
-  return {
+  const babelOptions = {
+    sourceType: "module",
+    compact: getOptions().isDevelopENV() ? "auto" : true,
+    minified: getOptions().isDevelopENV() ? false : true,
+    comments: getOptions().isDevelopENV() ? true : false,
     presets: [
       [require("../babel-preset-fetool")],
       isES6Enabled && [
         require("@babel/preset-env").default,
         {
-          useBuiltIns: "entry",
+          // targets: {
+          //   ie: 9
+          // },
+          ignoreBrowserslistConfig: true,
+          // useBuiltIns: "entry",
+          useBuiltIns: false,
           targets: { browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"] },
-          // modules: isCommonModules ? false : "amd"
+          modules: isModule ? false : "amd"
           // modules: false,
-          modules: 'amd'
+          // modules: 'amd'
           // debug: true
         }
       ],
-      isReactEnabled && [require("@babel/preset-react").default]
+      isReactEnabled && [
+        require("@babel/preset-react").default,
+        {
+          development: false,
+          useBuiltIns: true
+        }
+      ]
     ].filter(Boolean),
     plugins: [
       [require("../babel-plugin-tinytool")],
@@ -35,6 +52,7 @@ module.exports = function(
       isES6Enabled && [
         require("@babel/plugin-transform-runtime").default,
         {
+          corejs: false,
           helpers: false
           // polyfill: false,
           // regenerator: true
@@ -42,4 +60,6 @@ module.exports = function(
       ]
     ].filter(Boolean)
   };
+  // debugger;
+  return babelOptions;
 };

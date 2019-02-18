@@ -8,16 +8,14 @@ const path = require("path");
  * @return {Boolean} 判断结果
  */
 module.exports = function(str, extname) {
-  const { root, dir, name, ext } = path.parse(str);
-  // console.log('extname', root, dir, name, ext)
-  if (ext) {
-    // return `${str}${extname}`
-    return path.format({
-      root,
-      dir,
-      name,
-      ext: extname || ext
-    });
+  if (typeof str !== "string") {
+    return str;
   }
-  return str;
+
+  if (str.length === 0) {
+    return str;
+  }
+
+  var nStr = path.basename(str, path.extname(str)) + extname;
+  return path.join(path.dirname(str), nStr);
 };

@@ -1,36 +1,62 @@
 /**
- *  css处理任务 (css => css)
+ * @file css编译任务
+ * @author mengchen <mengchen002@ke.com>
+ * @module package
  */
-
 const gulp = require("gulp");
 const modifyCssUrls = require("gulp-modify-css-urls");
-const print = require("gulp-print").default;
-const cached = require("gulp-cached");
+const printer = require("../../gulp-plugin/gulp-printer");
+const changed = require("gulp-changed");
+const rename = require("gulp-rename");
+const postcss = require("gulp-postcss");
+const postcssPresetEnv = require("postcss-preset-env");
+const cssnano = require("cssnano");
 const { getOptions } = require("../../config");
-const { isURL } = require("../../util");
+const { isURL, isDataURI, swallowError } = require("../../util");
 
 const globalOptions = getOptions();
 
 module.exports = () => {
   return gulp.task("css:compile", () => {
     return gulp
-      .src(globalOptions.getGulpSrc("css", false, true))
-      .pipe(cached("css:compile"))
-      .pipe(print(filepath => `css编译: ${filepath}`))
+      .src(globalOptions.getGulpSrc("css"))
+      .pipe(changed(globalOptions.getGulpDest()))
+      .pipe(printer(filepath => `css编译任务 ${filepath}`))
       .pipe(
         modifyCssUrls({
           modify: function(url, filename) {
             // url字符  当前解析的文件路径
             if (isURL(url)) return url;
-            let resourcePath;
+            if (isDataURI(url)) return url;
             try {
-              resourcePath = globalOptions.resolve(`./${url}`, filename);
-              resourcePath = globalOptions.getURL(resourcePath);
+              url = url.split("?")[0];
+              const resourcePath = globalOptions.resolve(url, filename);
+              const module = globalOptions.getModule(resourcePath);
+              url = module.url;
             } catch (error) {
-              resourcePath = url;
             } finally {
-              return resourcePath;
+              return url;
             }
+          }
+        })
+      )
+      .pipe(
+        postcss(
+          [
+            postcssPresetEnv(/* pluginOptions */),
+            globalOptions.isDevelopENV() ? undefined : cssnano()
+          ].filter(Boolean)
+        )
+      )
+      .on("error", swallowError)
+      .pipe(
+        rename(function(path, file) {
+          if (path.extname == ".css") {
+            const module = globalOptions.getModule(file.path); // 生成hashcode
+            const hashCode = module.hashCode;
+            path.basename = hashCode
+              ? `${path.basename}.${hashCode}`
+              : path.basename;
           }
         })
       )

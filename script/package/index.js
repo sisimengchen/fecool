@@ -4,9 +4,10 @@
  * @module package
  */
 const Concat = require("concat-with-sourcemaps");
-const UglifyJS = require("uglify-js");
-const { getOptions } = require("../config");
 const fs = require("fs");
+const { getOptions } = require("../config");
+const { printer } = require("../util");
+
 class Package {
   constructor(options) {
     this.module = {};
@@ -32,6 +33,7 @@ class Package {
         name: name,
         dependencies: []
       };
+      printer.debug("添加模块", name);
       module = this.module["" + name];
       this.increment++;
     }
@@ -55,7 +57,9 @@ class Package {
       pkg = this.package["" + name];
     }
     if (module && pkg) {
-      module.dependencies.push(dependencyName);
+      printer.debug("添加依赖", name, dependencyName);
+      this.addModule(dependencyName);
+      module.dependencies.unshift(dependencyName);
     }
   }
 
@@ -67,7 +71,7 @@ class Package {
    */
   getDependenciesByName(name, allDependencies = [], cache = {}) {
     let module = this.module["" + name];
-    if (!module) return false;
+    if (!module) return false; // 这里逻辑有点问题
     if (!cache[name]) {
       cache["" + name] = true;
       allDependencies.unshift(name);
@@ -111,28 +115,51 @@ class Package {
    */
   concatDependencies() {
     if (!this.isResovled) return;
+    const envCode = getOptions().getEnvCode();
     const moduleNames = Object.keys(this.dependenciesMap);
     const moduleCount = moduleNames.length;
     if (!moduleNames.length) return false;
     for (let i = 0; i < moduleCount; i++) {
       const moduleName = moduleNames[i];
       const dependencies = this.dependenciesMap["" + moduleName];
-      const concat = new Concat(false, "all.js", "\n");
       const modulePath = getOptions().mapEntry2Output(moduleName);
-      dependencies.forEach((item, index) => {
-        let code = fs.readFileSync(getOptions().mapEntry2Output(item), "utf8");
-        if (!getOptions().isDevelopENV()) {
-          // 如果是开发环境，则不执行js的编译
-          const result = UglifyJS.minify(code);
-          code = result.code;
-        }
-        concat.add(item, code);
-      });
-      const out = fs.createWriteStream(modulePath, {
-        encoding: "utf8"
-      });
-      out.write(concat.content);
-      out.end();
+      const concat = new Concat(false, "all.js", "\n");
+      const packageall = Promise.all(
+        dependencies.map((filePath, index) => {
+          return new Promise((resolve, reject) => {
+            const outPutPath = getOptions().mapEntry2Output(filePath);
+            fs.readFile(outPutPath, (err, data) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve({
+                  outPutPath,
+                  code: data.toString()
+                });
+              }
+            });
+          });
+        })
+      );
+      packageall
+        .then(datas => {
+          concat.add("env.js", envCode);
+          datas.forEach((data, index) => {
+            const { outPutPath, code } = data;
+            try {
+              concat.add(outPutPath, code);
+            } catch (error) {
+              console.log(outPutPath);
+              console.log(error);
+            }
+          });
+          const out = fs.createWriteStream(modulePath, {
+            encoding: "utf8"
+          });
+          out.write(concat.content);
+          out.end();
+        })
+        .catch(error => {});
     }
   }
 }

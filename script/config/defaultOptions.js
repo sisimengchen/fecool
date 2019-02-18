@@ -1,5 +1,7 @@
 const defaultOptions = {
-  mode: "development",
+  mode: "production",
+  debug: false,
+  watch: false,
   context: process.cwd(),
   entry: {
     path: "./src",
@@ -8,27 +10,23 @@ const defaultOptions = {
   output: {
     path: "./dest",
     common: "./dest/common",
-    publicPath: ""
+    publicPath: "//fetool.com:8080"
   },
   resolve: {
-    extensions: [".js", ".jsx"],
     alias: {}
   },
-  js: {
-    lint: false,
-    types: ["js", "jsx"],
-    sourceMap: {
-      active: false,
-      inline: true
-    }
+  moduleDirectory: ["common_modules"],
+  template: "ejs",
+  server: {
+    port: 8080,
+    single: true, // 启用单页面模式
+    open: "external",
+    host: "fetool.com",
+    watch: false,
+    middleware: []
   },
-  css: {
-    sourceMap: {
-      active: true,
-      inline: true
-    }
-  },
-  moduleDirectory: ["common_modules"]
+  timestamp: undefined, // 指定资源构建的时间戳，为空则无
+  args: {} // 构建出来的代码可以通过window.__args来获构建环境相关参数
 };
 
 module.exports = defaultOptions;

@@ -15,23 +15,23 @@ const defaultOptions = {
 
 /**
  * [模板依赖处理器]
- * @param  {[type]} { name, source, filename } [name: 当前所处理的依赖对应的变量名称, source: 当前所处理的依赖值, filename: 当前所处理的代码绝对路径]
+ * @param  {[type]} { dependName, paramName, filename } [dependName: dep中对应的依赖名, paramName: callback中对应的参数名, filename: 当前所处理的代码绝对路径]
  * @param  {[type]} options   [当前loader配置]
  * @return {[type]}          [处理之后的返回新source]
  */
-module.exports = function({ name, source, filename }, options = {}) {
+module.exports = function({ dependName, paramName, filename }, options = {}) {
   const globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  let code;
+  let code, source;
   try {
-    const resourcePath = globalOptions.resolve(source, filename);
+    const resourcePath = globalOptions.resolve(dependName, filename);
     source = fs.readFileSync(resourcePath, "utf-8");
     source = source.replace(getOptions.urlReg, function(match, p1) {
       // 针对#url做寻路
       const p2 = p1.replace(/\#[^\#]+$/, "");
       const p3 = globalOptions.resolve(p2, resourcePath);
-      const p4 = globalOptions.getURL(p3);
-      return `\"${p4}\"`;
+      const module = globalOptions.getModule(p3); // 生成模块对象
+      return `\"${module.url}\"`;
     });
     if (options.minify) {
       source = minify(source, {
@@ -53,14 +53,14 @@ module.exports = function({ name, source, filename }, options = {}) {
   } finally {
   }
   try {
-    code = codeWrapper({ NAME: name, VALUE: source });
+    if (source) {
+      code = codeWrapper({ NAME: paramName, VALUE: source });
+    }
   } catch (error) {
     printer.error(error);
   }
   return {
     acitve: false,
-    name,
-    source,
     code
   };
 };

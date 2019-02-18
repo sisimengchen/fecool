@@ -37,40 +37,30 @@ const defaultRule = {
 };
 
 module.exports = t => {
-  const isCode = function(source) {
-    // 如果配置了rules则认为不是code
-    const rule = rules.find((item, index) => {
-      return item.test && item.test.test && item.test.test(source);
-    });
-    if (rule) {
-      return false;
-    }
-    return true;
-  };
-
-  const createCode = function(name, source) {
+  /**
+   *
+   * @param {*} dependName amd dep中对应的依赖名
+   * @param {*} paramName amd callback中对应的参数名
+   */
+  const createCode = function(dependName, paramName) {
     // 匹配规则，执行loader调用
-    printer.log(`解析路径：${source}`);
-    let isCode = false;
+    printer.debug("依赖名称", dependName, paramName);
     let rule = rules.find((item, index) => {
-      return item.test && item.test.test && item.test.test(source);
+      // 根据dependName的扩展名获取加载器插件
+      return item.test && item.test.test && item.test.test(dependName);
     });
     if (!rule) {
-      isCode = true;
       rule = defaultRule;
     }
-    printer.log(`执行加载器：${rule.name}`);
+    printer.debug("执行加载器", rule.name);
     const result = rule.loader(
-      { name, source, filename: this.filename },
+      { dependName, paramName, filename: this.filename },
       rule.options
     );
-    result.isCode = isCode;
-    // console.log(result)
     return result;
   };
 
   return {
-    isCode: isCode,
     createCode: createCode
   };
 };

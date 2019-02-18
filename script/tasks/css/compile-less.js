@@ -1,41 +1,64 @@
 /**
- *  less处理任务（les => css）
+ * @file less编译任务
+ * @author mengchen <mengchen002@ke.com>
+ * @module package
  */
-
 const gulp = require("gulp");
+const gulpif = require("gulp-if");
 const less = require("gulp-less");
-const modifyCssUrls = require("gulp-modify-css-urls");
-const print = require("gulp-print").default;
-const cached = require("gulp-cached");
+const sourcemaps = require("gulp-sourcemaps");
+const printer = require("../../gulp-plugin/gulp-printer");
+const changed = require("gulp-changed");
+const rename = require("gulp-rename");
+const postcss = require("gulp-postcss");
+const postcssPresetEnv = require("postcss-preset-env");
+const cssnano = require("cssnano");
 const { getOptions } = require("../../config");
-const { isURL } = require("../../util");
+const { swallowError, extname } = require("../../util");
+const resolveUrls = require("../../less-plugin/less-plugin-resolve-urls");
 
 const globalOptions = getOptions();
 
 module.exports = () => {
   return gulp.task("less:compile", done => {
-    return gulp
-      .src(globalOptions.getGulpSrc("less", false, true))
-      .pipe(cached("less:compile"))
-      .pipe(print(filepath => `less编译: ${filepath}`))
-      .pipe(less())
-      .pipe(
-        modifyCssUrls({
-          modify: function(url, filename) {
-            // url字符  当前解析的文件路径
-            if (isURL(url)) return url;
-            let resourcePath;
-            try {
-              resourcePath = globalOptions.resolve(`./${url}`, filename);
-              resourcePath = globalOptions.getURL(resourcePath);
-            } catch (error) {
-              resourcePath = url;
-            } finally {
-              return resourcePath;
+    return (
+      gulp
+        .src(globalOptions.getGulpSrc("less"))
+        .pipe(changed(globalOptions.getGulpDest(), { extension: ".css" }))
+        .pipe(printer(filepath => `less编译任务 ${filepath}`))
+        .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
+        .pipe(less({ plugins: [resolveUrls] }))
+        .pipe(
+          postcss(
+            [
+              postcssPresetEnv(/* pluginOptions */),
+              globalOptions.isDevelopENV() ? undefined : cssnano()
+            ].filter(Boolean)
+          )
+        )
+        .on("error", swallowError)
+        .pipe(
+          gulpif(
+            globalOptions.isDevelopENV(),
+            sourcemaps.write(globalOptions.sourceMapDirname, {
+              sourceMappingURLPrefix: globalOptions.publicPath
+            })
+          )
+        )
+        .pipe(
+          rename(function(path, file) {
+            if (path.extname == ".css") {
+              const module = globalOptions.getModule(
+                extname(file.path, ".less")
+              );
+              const hashCode = module.hashCode;
+              path.basename = hashCode
+                ? `${path.basename}.${hashCode}`
+                : path.basename;
             }
-          }
-        })
-      )
-      .pipe(gulp.dest(globalOptions.getGulpDest()));
+          })
+        )
+        .pipe(gulp.dest(globalOptions.getGulpDest()))
+    );
   });
 };

@@ -14,36 +14,37 @@ const defaultOptions = {
 
 /**
  * [图片依赖处理器]
- * @param  {[type]} { name, source, filename } [name: 当前所处理的依赖对应的变量名称, source: 当前所处理的依赖值, filename: 当前所处理的代码绝对路径]
+ * @param  {[type]} { dependName, paramName, filename } [dependName: dep中对应的依赖名, paramName: callback中对应的参数名, filename: 当前所处理的代码绝对路径]
  * @param  {[type]} options   [当前loader配置]
  * @return {[type]}          [处理之后的返回新source]
  */
-module.exports = function({ name, source, filename }, options = {}) {
+module.exports = function({ dependName, paramName, filename }, options = {}) {
   const globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  let code;
+  let code, source;
   try {
-    const resourcePath = globalOptions.resolve(source, filename);
+    const resourcePath = globalOptions.resolve(dependName, filename);
     const { size } = fs.lstatSync(resourcePath);
     if (size < options.limit) {
       // 图片输出成base64
       source = getDataURI(resourcePath);
     } else {
-      source = resourcePath;
+      const module = globalOptions.getModule(resourcePath); // 生成模块对象
+      source = module.url;
     }
   } catch (error) {
     printer.error(error);
   } finally {
   }
   try {
-    code = codeWrapper({ NAME: name, VALUE: source });
+    if (source) {
+      code = codeWrapper({ NAME: paramName, VALUE: source });
+    }
   } catch (error) {
     printer.error(error);
   }
   return {
     acitve: false,
-    name,
-    source,
     code
   };
 };

@@ -13,7 +13,7 @@ const {
 class Options {
   constructor(options = {}) {
     this.__options = options;
-    this.init();
+    this.init(options);
   }
 
   init(options) {

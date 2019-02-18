@@ -33,7 +33,7 @@ function () {
     _classCallCheck(this, Options);
 
     this.__options = options;
-    this.init();
+    this.init(options);
   }
 
   _createClass(Options, [{

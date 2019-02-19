@@ -137,7 +137,7 @@ module.exports = declare(function (api, options, dirname) {
                 var _name = callee.callee.name;
 
                 if (_name === "require" || _name === "__include" || _name === "__includejson") {
-                  var _args = init.arguments || []; // 获取require调用参数
+                  var _args = init.callee.arguments || []; // 获取require调用参数
 
 
                   if (_args.length) {
@@ -164,7 +164,7 @@ module.exports = declare(function (api, options, dirname) {
               var _name2 = _callee.name;
 
               if (_name2 === "require" || _name2 === "__include" || _name2 === "__includejson") {
-                var _args2 = init.arguments || []; // 获取require调用参数
+                var _args2 = init.object.arguments || []; // 获取require调用参数
 
 
                 if (_args2.length) {

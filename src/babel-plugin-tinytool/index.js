@@ -70,6 +70,7 @@ module.exports = declare((api, options, dirname) => {
       VariableDeclaration: {
         enter(path, { opts }) {
           if (!this.isTinytooljs) return;
+          
           // 这个要针对老代码做依赖收集，遍历变量定义的path，依赖收集
           const { node, parent } = path;
           const { declarations = [] } = node;
@@ -109,7 +110,7 @@ module.exports = declare((api, options, dirname) => {
                   name === "__include" ||
                   name === "__includejson"
                 ) {
-                  const args = init.arguments || []; // 获取require调用参数
+                  const args = init.callee.arguments || []; // 获取require调用参数
                   if (args.length) {
                     let source = args[0].value; // 获取require调用第一个参数的值
                     if (name === "__include") {
@@ -147,7 +148,7 @@ module.exports = declare((api, options, dirname) => {
                 name === "__include" ||
                 name === "__includejson"
               ) {
-                const args = init.arguments || []; // 获取require调用参数
+                const args = init.object.arguments || []; // 获取require调用参数
                 if (args.length) {
                   let source = args[0].value; // 获取require调用第一个参数的值
                   if (name === "__include") {

@@ -1,6 +1,6 @@
 {
   "name": "fetool",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "前端开发工具套件",
   "main": "index.js",
   "bin": {
@@ -17,7 +17,6 @@
     "fe",
     "fetool"
   ],
-  "author": "mengchen002@ke.com",
   "dependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
@@ -65,5 +64,8 @@
     "resolve": "^1.8.1",
     "run-sequence": "^2.2.1",
     "stream-combiner": "^0.2.2"
-  }
+  },
+  "author": "mengchen",
+  "license": "MIT",
+  "homepage": "https://github.com/sisimengchen/fetool"
 }

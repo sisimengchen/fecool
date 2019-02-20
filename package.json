@@ -4,7 +4,7 @@
   "description": "前端开发工具套件",
   "main": "index.js",
   "bin": {
-    "fetool": "./bin/cli.js"
+    "fecool": "./bin/cli.js"
   },
   "scripts": {
     "build": "node bin/cli.js",
@@ -68,9 +68,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sisimengchen/fetool.git"
+    "url": "git+https://github.com/sisimengchen/fecool.git"
   },
   "author": "mengchen",
   "license": "MIT",
-  "homepage": "https://github.com/sisimengchen/fetool"
+  "homepage": "https://github.com/sisimengchen/fecool"
 }

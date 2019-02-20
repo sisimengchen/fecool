@@ -12,7 +12,7 @@ var defaultOptions = {
   output: {
     path: "./dest",
     common: "./dest/common",
-    publicPath: "//fetool.com:8080"
+    publicPath: "//fecool.com:8080"
   },
   resolve: {
     alias: {}
@@ -24,7 +24,7 @@ var defaultOptions = {
     single: true,
     // 启用单页面模式
     open: "external",
-    host: "fetool.com",
+    host: "fecool.com",
     watch: false,
     middleware: []
   },

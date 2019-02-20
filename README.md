@@ -1,6 +1,6 @@
-# fetool(fecool)
+# fecool
 
-fetool(fecool)前端工程构建工具。解决前端工程中，资源加载、依赖管理，代码合并，资源压缩、模块化开发、代码部署、访问代理、mock生成等问题。
+fecool前端工程构建工具。解决前端工程中，资源加载、依赖管理，代码合并，资源压缩、模块化开发、代码部署、访问代理、mock生成等问题。
 
 ### 功能列表
 
@@ -25,31 +25,31 @@ npm install --save fecool
 生产环境构建
 
 ```shell
-fetool
+fecool
 ```
 
 开发环境构建
 
 ```shell
-fetool -d -e development
+fecool -d -e development
 ```
 
 监听文件变化
 
 ```shell
-fetool -d -e development -w
+fecool -d -e development -w
 ```
 
 启动开发服务
 
 ```shell
-fetool -s
+fecool -s
 ```
 
 ### 配置项
 
-项目配置文件：工具启动默认会导入当前项目根目录下的fetool.config.js
-自定义项目配置文件：通过fetool的命令行工具增加-c参数，支持其他配置文件，例如：fetool -d -e development -w -c fetool.config.juejin.js
+项目配置文件：工具启动默认会导入当前项目根目录下的fecool.config.js
+自定义项目配置文件：通过fecool的命令行工具增加-c参数，支持其他配置文件，例如：fecool -d -e development -w -c fecool.config.juejin.js
 建议：项目中开发环境和编译环境采用两套配置文件
 
 ```javascript
@@ -62,7 +62,7 @@ const config = {
   output: {
     path: "./dist", // 导出代码根目录
     common: "./dist/common", // 导出公共代码根目录
-    publicPath: "//fetool.com:8080" // 静态资源路径前缀
+    publicPath: "//fecool.com:8080" // 静态资源路径前缀
   },
   resolve: {
     alias: { // 资源寻路别名
@@ -75,7 +75,7 @@ const config = {
     port: 8080,
     single: true, // 启用单页面模式
     open: "external", // 启动浏览器 "external"
-    host: "fetool.com",
+    host: "fecool.com",
     watch: false,
     middleware: []
   },
@@ -91,7 +91,7 @@ module.exports = config;
 
 ##### 什么是资源寻路？都哪些资源支持寻路？如何触发资源的寻路
 
-资源寻路就是，fetool会根据当前代码里对其他资源的引用代码，解析资源，并根据用户设定的output.publicPath去生成资源最终在web服务器中的绝对路径。解析资源主要采用了类似于nodejs的寻路方式，只不过fetool为了避免解析到node_moudules中的资源，把node_moudules目录改成了common_modules目录。
+资源寻路就是，fecool会根据当前代码里对其他资源的引用代码，解析资源，并根据用户设定的output.publicPath去生成资源最终在web服务器中的绝对路径。解析资源主要采用了类似于nodejs的寻路方式，只不过fecool为了避免解析到node_moudules中的资源，把node_moudules目录改成了common_modules目录。
 
 *注意node_moudules这种寻路方式只适用于javascript代码，针对模板以及样式表的寻路，请正常按照文件的相对路径引用方式。
 
@@ -106,7 +106,7 @@ module.exports = config;
 
 ##### 配置项里的entry.common和output.common，这个common是什么？为什么要指定common
 
-entry.common目录是一个很特殊的目录，这个目录下的.js代码不参与任何编译和寻路过程，并最后会被合并成一个文件common.js，如果你想使用成熟的编译后的，并且不会其他代码寻找到的js库，比如jquery，requirejs（目前不用这玩意fetool就跑不转），polyfill.js等等，建议都放到这里。output.common就是common.js的输出目录，没什么好说的，相对一致就好。
+entry.common目录是一个很特殊的目录，这个目录下的.js代码不参与任何编译和寻路过程，并最后会被合并成一个文件common.js，如果你想使用成熟的编译后的，并且不会其他代码寻找到的js库，比如jquery，requirejs（目前不用这玩意fecool就跑不转），polyfill.js等等，建议都放到这里。output.common就是common.js的输出目录，没什么好说的，相对一致就好。
 
 ##### 配置项里的resolve.alias是什么？resolve.alias怎么用？
 
@@ -115,17 +115,17 @@ resolve.alias是用来为资源寻路增加一个目录的别名，key代表了�
 ##### 配置项里有args，这个args是什么？
 
 args这个对象会注入到到每一个构建输出js代码包里，当加载了代码包后，可以通过window.__args访问args这个对象的值。
-在fetool构建过程中，会给args自动插入两个属性：buildTimestamp（构建时间戳），env（构建环境）用来帮助开发者获取一些构建的必要基本信息
+在fecool构建过程中，会给args自动插入两个属性：buildTimestamp（构建时间戳），env（构建环境）用来帮助开发者获取一些构建的必要基本信息
 
 ##### 关于 /\* \@tinytooljs \*\/ 和 \/\* \@thirdmodule \*\/的使用
 
-这两个注释是针对js代码做的特殊标记。fetool解析到代码文件头几个字符是这俩个注释中的一个，都会触发特殊的构建条件。
+这两个注释是针对js代码做的特殊标记。fecool解析到代码文件头几个字符是这俩个注释中的一个，都会触发特殊的构建条件。
 /* @tinytooljs */ 表示的是旧版tinytooljs工具的js代码，当检测到有这个注释的时候，系统会触发额外的构建流程，兼容tinytooljs所构建出的代码。
 /* @thirdmodule */ 表示的是已经是amd或者umd包的代码，当检测到有这个注释的时候，系统会触发额外的构建流程，避免@babel/preset-env在导出amd的时候出现的二次包装问题。
 
 ##### 关于开发服务器的使用
 
-fetool内置browser-sync + http-proxy-middleware，支持访问代理配置。各个项目代理配置情况需要自定义，需要用http-proxy-middleware生成一个中间件，放到server.middleware中即可,具体配置请参考[browser-sync配置](https://www.browsersync.io/docs/optionsd)，[http-proxy-middleware配置](https://github.com/chimurai/http-proxy-middleware)。
+fecool内置browser-sync + http-proxy-middleware，支持访问代理配置。各个项目代理配置情况需要自定义，需要用http-proxy-middleware生成一个中间件，放到server.middleware中即可,具体配置请参考[browser-sync配置](https://www.browsersync.io/docs/optionsd)，[http-proxy-middleware配置](https://github.com/chimurai/http-proxy-middleware)。
 
-当前版本的fetool同时支持ejs同步mock功能，当用开发服务器访问.ejs资源的时候，把通目录下的mock.mockjs文件作为js对象注入到ejs模板中。
+当前版本的fecool同时支持ejs同步mock功能，当用开发服务器访问.ejs资源的时候，把通目录下的mock.mockjs文件作为js对象注入到ejs模板中。
 

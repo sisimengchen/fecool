@@ -11,12 +11,11 @@
     "dev": "node bin/cli.js -d -e development",
     "watch": "node bin/cli.js -d -e development -w",
     "server": "node bin/cli.js -s",
-    "babel": "babel ./src --out-dir dist/",
-    "bug": "node --inspect ./script/babel.js"
+    "babel": "babel ./src --out-dir dist/"
   },
   "keywords": [
     "fe",
-    "fetool"
+    "fecool"
   ],
   "dependencies": {
     "@babel/cli": "^7.2.3",

@@ -1,6 +1,6 @@
 # babel-plugin-transform-modules-amd
 
-fetool核心插件，要在@babel/preset-env在生成amd模块之后执行
+fecool核心插件，要在@babel/preset-env在生成amd模块之后执行
 
 ## 主要功能
 

@@ -18,7 +18,7 @@ module.exports = function(
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
     presets: [
-      [require("../babel-preset-fetool")],
+      [require("../babel-preset-fecool")],
       isES6Enabled && [
         require("@babel/preset-env").default,
         {

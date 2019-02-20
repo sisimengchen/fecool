@@ -66,7 +66,7 @@ module.exports = declare((api, options) => {
           } else if (calleeName === DEFINE) {
             args[2] = args[1];
             args[1] = args[0];
-            // args[0] = t.stringLiteral("@fetool_temp_name"); // 生成一个临时的 moduleName后面处理会被替换掉
+            // args[0] = t.stringLiteral("@fecool_temp_name"); // 生成一个临时的 moduleName后面处理会被替换掉
             if (args[1] && t.isArrayExpression(args[1])) {
               deps = args[1];
               callback = args[2];

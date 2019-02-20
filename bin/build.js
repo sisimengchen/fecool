@@ -4,7 +4,7 @@ const { printer } = require("../dist/util");
 const asciiArt = require("../dist/util/asciiArt");
 
 module.exports = function init() {
-  asciiArt("fetool");
+  asciiArt("fecool");
   const globalOptions = getOptions();
   require("../dist/tasks/main");
   if (globalOptions.isWatch()) {

@@ -25,7 +25,7 @@ if (program.debug) {
 
 const configPath = path.resolve(
   process.cwd(),
-  program.config || "fetool.config.js"
+  program.config || "fecool.config.js"
 );
 
 let userOptions = {};

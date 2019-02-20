@@ -20,7 +20,7 @@ module.exports = function () {
     compact: getOptions().isDevelopENV() ? "auto" : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
-    presets: [[require("../babel-preset-fetool")], isES6Enabled && [require("@babel/preset-env").default, {
+    presets: [[require("../babel-preset-fecool")], isES6Enabled && [require("@babel/preset-env").default, {
       // targets: {
       //   ie: 9
       // },

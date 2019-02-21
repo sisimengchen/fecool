@@ -21,33 +21,33 @@ const urlReg = new RegExp(
   "gi"
 );
 
-module.exports = () => {
-  return gulp.task("html:compile", () => {
-    return gulp
-      .src(globalOptions.getGulpSrc("html"))
-      .pipe(changed(globalOptions.getGulpDest()))
-      .pipe(printer(filepath => `html编译任务 ${filepath}`))
-      .pipe(
-        replace(urlReg, function(match, str) {
-          let source = str.replace(/\#[^\#]+$/, "");
-          try {
-            const resourcePath = globalOptions.resolve(source, this.file.path);
-            const module = globalOptions.getModule(resourcePath);
-            source = module.url;
-          } catch (error) {
-          } finally {
-            return `\'${source}\'`;
-          }
-        })
-      )
-      .pipe(inlinesource())
-      .pipe(
-        template({
-          publicPath: globalOptions.publicPath,
-          envCode: globalOptions.getEnvCode()
-        })
-      )
-      .on("error", swallowError)
-      .pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+function htmlCompile() {
+  return gulp
+    .src(globalOptions.getGulpSrc("html"))
+    .pipe(changed(globalOptions.getGulpDest()))
+    .pipe(printer(filepath => `html编译任务 ${filepath}`))
+    .pipe(
+      replace(urlReg, function(match, str) {
+        let source = str.replace(/\#[^\#]+$/, "");
+        try {
+          const resourcePath = globalOptions.resolve(source, this.file.path);
+          const module = globalOptions.getModule(resourcePath);
+          source = module.url;
+        } catch (error) {
+        } finally {
+          return `\'${source}\'`;
+        }
+      })
+    )
+    .pipe(inlinesource())
+    .pipe(
+      template({
+        publicPath: globalOptions.publicPath,
+        envCode: globalOptions.getEnvCode()
+      })
+    )
+    .on("error", swallowError)
+    .pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = htmlCompile;

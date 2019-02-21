@@ -20,10 +20,10 @@ var _require = require("../../config"),
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("css:common:concat", function (done) {
-    return gulp.src(globalOptions.getGulpCommon4Dest("css")).pipe(cached("css:common:concat")).pipe(printer(function (filepath) {
-      return "css:common:concat: ".concat(filepath);
-    })).pipe(remember("css:common:concat")).pipe(concat("common.css")).pipe(gulp.dest(globalOptions.getCommonDest()));
-  });
-};
+function cssConcat() {
+  return gulp.src(globalOptions.getGulpCommon4Dest("css")).pipe(cached("css:common:concat")).pipe(printer(function (filepath) {
+    return "css:common:concat: ".concat(filepath);
+  })).pipe(remember("css:common:concat")).pipe(concat("common.css")).pipe(gulp.dest(globalOptions.getCommonDest()));
+}
+
+module.exports = cssConcat;

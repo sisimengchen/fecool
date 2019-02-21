@@ -1,31 +1,28 @@
-const gulp = require("gulp");
-const path = require("path");
-const watch = require("gulp-watch");
+const { watch } = require("gulp");
 const { getOptions } = require("../../config");
+const devBuild = require("./build-dev");
+const {
+  move,
+  cssCompile,
+  stylusCompile,
+  lessCompile,
+  jsCompile,
+  jsxCompile,
+  htmlCompile
+} = require("./index.js");
 
 const globalOptions = getOptions();
 
-module.exports = function() {
-  return gulp.task("main:watch", ["main:build-dev"], function(cb) {
-    return watch(globalOptions.getGulpSrc(), function(vinyl) {
-      console.log(vinyl.path);
-      const path = vinyl.path;
-      const extname = vinyl.extname;
-      if (extname === ".js") {
-        gulp.start("js:compile");
-      } else if (extname === ".jsx") {
-        gulp.start("jsx:compile");
-      } else if (extname === ".css") {
-        gulp.start("css:compile");
-      } else if (extname === ".styl") {
-        gulp.start("styl:compile");
-      } else if (extname === ".less") {
-        gulp.start("less:compile");
-      } else if (extname === ".html") {
-        gulp.start("html:compile");
-      } else {
-        gulp.start("other:move");
-      }
-    });
+function watchBuild() {
+  devBuild(() => {
+    watch(globalOptions.getGulpSrc("js", false, true), jsCompile);
+    watch(globalOptions.getGulpSrc("jsx", false, true), jsxCompile);
+    watch(globalOptions.getGulpSrc("css"), cssCompile);
+    watch(globalOptions.getGulpSrc("styl"), stylusCompile);
+    watch(globalOptions.getGulpSrc("less"), lessCompile);
+    watch(globalOptions.getGulpSrc("html"), htmlCompile);
+    watch(globalOptions.getGulpSrc("*", "{js,jsx,css,less,styl,html}"), move);
   });
-};
+}
+
+module.exports = watchBuild;

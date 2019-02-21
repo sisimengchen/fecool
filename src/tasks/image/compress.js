@@ -4,36 +4,36 @@
  * @module package
  */
 const gulp = require("gulp");
-const gulpif = require("gulp-if");
+// const gulpif = require("gulp-if");
 const imagemin = require("gulp-imagemin");
 const printer = require("../../gulp-plugin/gulp-printer");
 const { getOptions } = require("../../config");
 
 const globalOptions = getOptions();
 
-module.exports = () => {
-  return gulp.task("image:compress", () => {
-    if (process.env.IMAGE_MIN == '0') {
-      return undefined
-    }
-    return gulp
-      .src(globalOptions.getGulpSrc4Dest("{png,jpg,jpeg,gif,svg}"))
-      .pipe(printer(filepath => `图片压缩任务 ${filepath}`))
-      .pipe(
-        imagemin([
-          imagemin.gifsicle({ interlaced: true }),
-          imagemin.jpegtran({ progressive: true }),
-          imagemin.optipng({ optimizationLevel: 5 }),
-          imagemin.svgo({
-            plugins: [
-              { cleanupIDs: false },
-              { removeViewBox: false },
-              { convertPathData: false },
-              { mergePaths: false }
-            ]
-          })
-        ])
-      )
-      .pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+function imageCompress() {
+  if (process.env.IMAGE_MIN == "0") {
+    return undefined;
+  }
+  return gulp
+    .src(globalOptions.getGulpSrc4Dest("{png,jpg,jpeg,gif,svg}"))
+    .pipe(printer(filepath => `图片压缩任务 ${filepath}`))
+    .pipe(
+      imagemin([
+        imagemin.gifsicle({ interlaced: true }),
+        imagemin.jpegtran({ progressive: true }),
+        imagemin.optipng({ optimizationLevel: 5 }),
+        imagemin.svgo({
+          plugins: [
+            { cleanupIDs: false },
+            { removeViewBox: false },
+            { convertPathData: false },
+            { mergePaths: false }
+          ]
+        })
+      ])
+    )
+    .pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = imageCompress;

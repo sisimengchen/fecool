@@ -36,24 +36,24 @@ var resolveUrls = require("../../less-plugin/less-plugin-resolve-urls");
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("less:compile", function (done) {
-    return gulp.src(globalOptions.getGulpSrc("less")).pipe(changed(globalOptions.getGulpDest(), {
-      extension: ".css"
-    })).pipe(printer(function (filepath) {
-      return "less\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-    })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-    .pipe(less({
-      plugins: [resolveUrls]
-    })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
-      sourceMappingURLPrefix: globalOptions.publicPath
-    }))).pipe(rename(function (path, file) {
-      if (path.extname == ".css") {
-        var _module = globalOptions.getModule(extname(file.path, ".less"));
+function lessCompile() {
+  return gulp.src(globalOptions.getGulpSrc("less")).pipe(changed(globalOptions.getGulpDest(), {
+    extension: ".css"
+  })).pipe(printer(function (filepath) {
+    return "less\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
+  .pipe(less({
+    plugins: [resolveUrls]
+  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+    sourceMappingURLPrefix: globalOptions.publicPath
+  }))).pipe(rename(function (path, file) {
+    if (path.extname == ".css") {
+      var _module = globalOptions.getModule(extname(file.path, ".less"));
 
-        var hashCode = _module.hashCode;
-        path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
-      }
-    })).pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+      var hashCode = _module.hashCode;
+      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+    }
+  })).pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = lessCompile;

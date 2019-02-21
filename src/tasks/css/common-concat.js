@@ -12,14 +12,14 @@ const { getOptions } = require("../../config");
 
 const globalOptions = getOptions();
 
-module.exports = function() {
-  return gulp.task("css:common:concat", done => {
-    return gulp
-      .src(globalOptions.getGulpCommon4Dest("css"))
-      .pipe(cached("css:common:concat"))
-      .pipe(printer(filepath => `css:common:concat: ${filepath}`))
-      .pipe(remember("css:common:concat"))
-      .pipe(concat("common.css"))
-      .pipe(gulp.dest(globalOptions.getCommonDest()));
-  });
-};
+function cssConcat() {
+  return gulp
+  .src(globalOptions.getGulpCommon4Dest("css"))
+  .pipe(cached("css:common:concat"))
+  .pipe(printer(filepath => `css:common:concat: ${filepath}`))
+  .pipe(remember("css:common:concat"))
+  .pipe(concat("common.css"))
+  .pipe(gulp.dest(globalOptions.getCommonDest()));
+}
+
+module.exports = cssConcat;

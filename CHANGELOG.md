@@ -1,5 +1,12 @@
 # fecool changelog
 
+## 0.0.8
+
+### bug修复
+
+- 修复process.env.IMAGE_MIN == "0"未执行打包程序的bug
+  - imageCompress返回undefined未触发build的callback
+
 ## 0.0.7
 
 ### bug修复

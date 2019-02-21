@@ -1,8 +1,5 @@
 "use strict";
 
-var gulp = require("gulp"); // const printer = require("../../gulp-plugin/gulp-printer");
-
-
 var del = require("del");
 
 var _require = require("../../config"),
@@ -10,8 +7,8 @@ var _require = require("../../config"),
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("clean", function () {
-    return del(["".concat(globalOptions.getGulpDest(), "/**/*")]);
-  });
-};
+function clean() {
+  return del(["".concat(globalOptions.getGulpDest(), "/**/*")]);
+}
+
+module.exports = clean;

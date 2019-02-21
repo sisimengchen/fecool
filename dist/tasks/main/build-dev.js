@@ -1,21 +1,18 @@
 "use strict";
 
-var gulp = require("gulp");
+var _require = require("gulp"),
+    series = _require.series,
+    parallel = _require.parallel;
 
-var getPackage = require("../../package");
+var _require2 = require("./index.js"),
+    move = _require2.move,
+    cssCompile = _require2.cssCompile,
+    stylusCompile = _require2.stylusCompile,
+    lessCompile = _require2.lessCompile,
+    jsCompile = _require2.jsCompile,
+    jsxCompile = _require2.jsxCompile,
+    commonjsConcat = _require2.commonjsConcat,
+    htmlCompile = _require2.htmlCompile;
 
-var runSequence = require("run-sequence").use(gulp);
-
-module.exports = function () {
-  return gulp.task("main:build-dev", function (cb) {
-    runSequence(["other:move"], ["css:compile", // css编译
-    "styl:compile", // styl编译
-    "less:compile" // less编译
-    ], ["js:compile", // js编译
-    "jsx:compile", // jsx编译
-    "js:common-concat"], ["html:compile" // 目录迁移
-    ], function () {
-      cb && cb();
-    });
-  });
-};
+var devBuild = series(parallel(move), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile));
+module.exports = devBuild;

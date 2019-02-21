@@ -1,28 +1,14 @@
 "use strict";
 
-require("../clean/index")();
-
-require("../other/move")();
-
-require("../css/compile-css")();
-
-require("../css/compile-stylus")();
-
-require("../css/compile-less")();
-
-require("../js/compile-js")();
-
-require("../js/compile-jsx")();
-
-require("../js/common-concat")();
-
-require("../templates/compile-html")(); // require("../image/move")();
-
-
-require("../image/compress")();
-
-require("./build-dev")();
-
-require("./build")();
-
-require("./watch")();
+module.exports = {
+  clean: require("../clean/index"),
+  move: require("../other/move"),
+  cssCompile: require("../css/compile-css"),
+  stylusCompile: require("../css/compile-stylus"),
+  lessCompile: require("../css/compile-less"),
+  jsCompile: require("../js/compile-js"),
+  jsxCompile: require("../js/compile-jsx"),
+  commonjsConcat: require("../js/common-concat"),
+  htmlCompile: require("../templates/compile-html"),
+  imageCompress: require("../image/compress")
+};

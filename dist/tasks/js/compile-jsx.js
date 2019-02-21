@@ -29,27 +29,27 @@ var _require2 = require("../../util"),
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("jsx:compile", function (done) {
-    return gulp.src(globalOptions.getGulpSrc("jsx", false, true)) // 对于非common目录下的所有.jsx资源执行
-    .pipe(changed(globalOptions.getGulpDest(), {
-      extension: ".js"
-    })).pipe(printer(function (filepath) {
-      return "jsx\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-    })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-    .pipe(babel(getBabelOptions({
-      isModule: false,
-      isES6Enabled: true,
-      isReactEnabled: true
-    }))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
-      sourceMappingURLPrefix: globalOptions.publicPath
-    }))).pipe(rename(function (path, file) {
-      if (path.extname === ".js") {
-        var _module = globalOptions.getModule(extname(file.path, ".jsx"));
+function jsxCompile() {
+  return gulp.src(globalOptions.getGulpSrc("jsx", false, true)) // 对于非common目录下的所有.jsx资源执行
+  .pipe(changed(globalOptions.getGulpDest(), {
+    extension: ".js"
+  })).pipe(printer(function (filepath) {
+    return "jsx\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
+  .pipe(babel(getBabelOptions({
+    isModule: false,
+    isES6Enabled: true,
+    isReactEnabled: true
+  }))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+    sourceMappingURLPrefix: globalOptions.publicPath
+  }))).pipe(rename(function (path, file) {
+    if (path.extname === ".js") {
+      var _module = globalOptions.getModule(extname(file.path, ".jsx"));
 
-        var hashCode = _module.hashCode;
-        path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
-      }
-    })).pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+      var hashCode = _module.hashCode;
+      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+    }
+  })).pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = jsxCompile;

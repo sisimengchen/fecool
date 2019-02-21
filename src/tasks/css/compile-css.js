@@ -16,50 +16,50 @@ const { isURL, isDataURI, swallowError } = require("../../util");
 
 const globalOptions = getOptions();
 
-module.exports = () => {
-  return gulp.task("css:compile", () => {
-    return gulp
-      .src(globalOptions.getGulpSrc("css"))
-      .pipe(changed(globalOptions.getGulpDest()))
-      .pipe(printer(filepath => `css编译任务 ${filepath}`))
-      .pipe(
-        modifyCssUrls({
-          modify: function(url, filename) {
-            // url字符  当前解析的文件路径
-            if (isURL(url)) return url;
-            if (isDataURI(url)) return url;
-            try {
-              url = url.split("?")[0];
-              const resourcePath = globalOptions.resolve(url, filename);
-              const module = globalOptions.getModule(resourcePath);
-              url = module.url;
-            } catch (error) {
-            } finally {
-              return url;
-            }
+function cssCompile() {
+  return gulp
+    .src(globalOptions.getGulpSrc("css"))
+    .pipe(changed(globalOptions.getGulpDest()))
+    .pipe(printer(filepath => `css编译任务 ${filepath}`))
+    .pipe(
+      modifyCssUrls({
+        modify: function(url, filename) {
+          // url字符  当前解析的文件路径
+          if (isURL(url)) return url;
+          if (isDataURI(url)) return url;
+          try {
+            url = url.split("?")[0];
+            const resourcePath = globalOptions.resolve(url, filename);
+            const module = globalOptions.getModule(resourcePath);
+            url = module.url;
+          } catch (error) {
+          } finally {
+            return url;
           }
-        })
+        }
+      })
+    )
+    .pipe(
+      postcss(
+        [
+          postcssPresetEnv(/* pluginOptions */),
+          globalOptions.isDevelopENV() ? undefined : cssnano()
+        ].filter(Boolean)
       )
-      .pipe(
-        postcss(
-          [
-            postcssPresetEnv(/* pluginOptions */),
-            globalOptions.isDevelopENV() ? undefined : cssnano()
-          ].filter(Boolean)
-        )
-      )
-      .on("error", swallowError)
-      .pipe(
-        rename(function(path, file) {
-          if (path.extname == ".css") {
-            const module = globalOptions.getModule(file.path); // 生成hashcode
-            const hashCode = module.hashCode;
-            path.basename = hashCode
-              ? `${path.basename}.${hashCode}`
-              : path.basename;
-          }
-        })
-      )
-      .pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+    )
+    .on("error", swallowError)
+    .pipe(
+      rename(function(path, file) {
+        if (path.extname == ".css") {
+          const module = globalOptions.getModule(file.path); // 生成hashcode
+          const hashCode = module.hashCode;
+          path.basename = hashCode
+            ? `${path.basename}.${hashCode}`
+            : path.basename;
+        }
+      })
+    )
+    .pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = cssCompile;

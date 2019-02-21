@@ -1,38 +1,34 @@
 "use strict";
 
-var gulp = require("gulp");
+var _require = require("gulp"),
+    watch = _require.watch;
 
-var path = require("path");
+var _require2 = require("../../config"),
+    getOptions = _require2.getOptions;
 
-var watch = require("gulp-watch");
+var devBuild = require("./build-dev");
 
-var _require = require("../../config"),
-    getOptions = _require.getOptions;
+var _require3 = require("./index.js"),
+    move = _require3.move,
+    cssCompile = _require3.cssCompile,
+    stylusCompile = _require3.stylusCompile,
+    lessCompile = _require3.lessCompile,
+    jsCompile = _require3.jsCompile,
+    jsxCompile = _require3.jsxCompile,
+    htmlCompile = _require3.htmlCompile;
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("main:watch", ["main:build-dev"], function (cb) {
-    return watch(globalOptions.getGulpSrc(), function (vinyl) {
-      console.log(vinyl.path);
-      var path = vinyl.path;
-      var extname = vinyl.extname;
-
-      if (extname === ".js") {
-        gulp.start("js:compile");
-      } else if (extname === ".jsx") {
-        gulp.start("jsx:compile");
-      } else if (extname === ".css") {
-        gulp.start("css:compile");
-      } else if (extname === ".styl") {
-        gulp.start("styl:compile");
-      } else if (extname === ".less") {
-        gulp.start("less:compile");
-      } else if (extname === ".html") {
-        gulp.start("html:compile");
-      } else {
-        gulp.start("other:move");
-      }
-    });
+function watchBuild() {
+  devBuild(function () {
+    watch(globalOptions.getGulpSrc("js", false, true), jsCompile);
+    watch(globalOptions.getGulpSrc("jsx", false, true), jsxCompile);
+    watch(globalOptions.getGulpSrc("css"), cssCompile);
+    watch(globalOptions.getGulpSrc("styl"), stylusCompile);
+    watch(globalOptions.getGulpSrc("less"), lessCompile);
+    watch(globalOptions.getGulpSrc("html"), htmlCompile);
+    watch(globalOptions.getGulpSrc("*", "{js,jsx,css,less,styl,html}"), move);
   });
-};
+}
+
+module.exports = watchBuild;

@@ -29,39 +29,35 @@ var _require2 = require("../../util"),
 
 var globalOptions = getOptions();
 
-module.exports = function () {
-  return gulp.task("js:compile", function (done) {
-    return gulp.src(globalOptions.getGulpSrc("js", false, true)) // 对于非common目录下的所有.js资源执行
-    .pipe(changed(globalOptions.getGulpDest(), {
-      extension: ".js"
-    })).pipe(printer(function (filepath) {
-      return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-    })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-    .pipe(gulpif(function (file) {
-      var path = file.path,
-          contents = file.contents;
-      return !contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
-    }, babel(getBabelOptions({
-      isModule: false,
-      isES6Enabled: true,
-      isReactEnabled: false
-    })))).pipe(gulpif(function (file) {
-      var path = file.path,
-          contents = file.contents;
-      return contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
-    }, babel(getBabelOptions({
-      isModule: true,
-      isES6Enabled: true,
-      isReactEnabled: false
-    })))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
-      sourceMappingURLPrefix: globalOptions.publicPath
-    }))).pipe(rename(function (path, file) {
-      if (path.extname === ".js") {
-        var _module = globalOptions.getModule(file.path);
+function jsCompile() {
+  return gulp.src(globalOptions.getGulpSrc("js", false, true)) // 对于非common目录下的所有.js资源执行
+  .pipe(changed(globalOptions.getGulpDest(), {
+    extension: ".js"
+  })).pipe(printer(function (filepath) {
+    return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
+  .pipe(gulpif(function (file) {
+    var path = file.path,
+        contents = file.contents;
+    return !contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
+  }, babel(getBabelOptions({
+    isModule: false,
+    isES6Enabled: true,
+    isReactEnabled: false
+  })))).pipe(gulpif(function (file) {
+    var path = file.path,
+        contents = file.contents;
+    return contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
+  }, babel())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+    sourceMappingURLPrefix: globalOptions.publicPath
+  }))).pipe(rename(function (path, file) {
+    if (path.extname === ".js") {
+      var _module = globalOptions.getModule(file.path);
 
-        var hashCode = _module.hashCode;
-        path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
-      }
-    })).pipe(gulp.dest(globalOptions.getGulpDest()));
-  });
-};
+      var hashCode = _module.hashCode;
+      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+    }
+  })).pipe(gulp.dest(globalOptions.getGulpDest()));
+}
+
+module.exports = jsCompile;

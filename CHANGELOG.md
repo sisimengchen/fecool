@@ -1,5 +1,13 @@
 # fecool changelog
 
+## 0.0.9
+
+### js语法支持
+
+- 支持装饰器+class-properties
+  - babel插件增加@babel/plugin-proposal-decorators
+  - babel插件增加@babel/plugin-proposal-class-properties
+
 ## 0.0.8
 
 ### bug修复

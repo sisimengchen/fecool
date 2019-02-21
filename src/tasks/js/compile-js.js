@@ -38,6 +38,7 @@ function jsCompile() {
         )
       )
     )
+    .on("error", swallowError)
     .pipe(
       gulpif(
         file => {
@@ -47,11 +48,11 @@ function jsCompile() {
             .startsWith("/* @thirdmodule */");
         },
         babel(
-          // getBabelOptions({
-          //   isModule: true,
-          //   isES6Enabled: true,
-          //   isReactEnabled: false
-          // })
+          getBabelOptions({
+            isModule: true,
+            isES6Enabled: true,
+            isReactEnabled: false
+          })
         )
       )
     )

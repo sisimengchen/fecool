@@ -44,11 +44,15 @@ function jsCompile() {
     isModule: false,
     isES6Enabled: true,
     isReactEnabled: false
-  })))).pipe(gulpif(function (file) {
+  })))).on("error", swallowError).pipe(gulpif(function (file) {
     var path = file.path,
         contents = file.contents;
     return contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
-  }, babel())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+  }, babel(getBabelOptions({
+    isModule: true,
+    isES6Enabled: true,
+    isReactEnabled: false
+  })))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

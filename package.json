@@ -1,6 +1,6 @@
 {
   "name": "fecool",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "前端开发工具套件",
   "main": "index.js",
   "bin": {
@@ -11,7 +11,8 @@
     "dev": "node bin/cli.js -d -e development",
     "watch": "node bin/cli.js -d -e development -w",
     "server": "node bin/cli.js -s",
-    "babel": "babel ./src --out-dir dist/"
+    "babel": "babel ./src --out-dir dist/",
+    "test": "node index.js"
   },
   "keywords": [
     "fe",
@@ -20,6 +21,8 @@
   "dependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
+    "@babel/plugin-proposal-class-properties": "^7.3.3",
+    "@babel/plugin-proposal-decorators": "^7.3.0",
     "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/preset-env": "^7.3.1",
     "@babel/preset-react": "^7.0.0",

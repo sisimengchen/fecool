@@ -1,5 +1,12 @@
 # fecool changelog
 
+## 0.0.7
+
+### bug修复
+
+- 修复部门项目http-proxy-middleware未找到报错的问题
+  - 增加默认依赖http-proxy-middleware
+
 ## 0.0.6
 
 ### 依赖升级

@@ -1,6 +1,6 @@
 {
   "name": "fecool",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "前端开发工具套件",
   "main": "index.js",
   "bin": {
@@ -49,6 +49,7 @@
     "gulp-template": "^5.0.0",
     "hasha": "^3.0.0",
     "html-minifier": "^3.5.21",
+    "http-proxy-middleware": "^0.19.1",
     "less": "^3.9.0",
     "map-stream": "0.0.7",
     "mime": "^2.4.0",

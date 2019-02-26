@@ -18,7 +18,9 @@ program
   .parse(process.argv);
 
 process.env.NODE_ENV = program.environment || "production";
+
 process.env.VERSION = require("../package.json").version;
+
 if (program.debug) {
   process.env.DEBUG = "debug";
 }
@@ -32,6 +34,7 @@ let userOptions = {};
 try {
   userOptions = require(configPath);
 } catch (error) {
+  printer.error(error);
   printer.warn(`用户配置文件${configPath}不存在，启用默认配置`);
 }
 

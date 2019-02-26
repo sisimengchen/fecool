@@ -1,6 +1,6 @@
 {
   "name": "fecool",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "前端开发工具套件",
   "main": "index.js",
   "bin": {
@@ -11,8 +11,7 @@
     "dev": "node bin/cli.js -d -e development",
     "watch": "node bin/cli.js -d -e development -w",
     "server": "node bin/cli.js -s",
-    "babel": "babel ./src --out-dir dist/",
-    "test": "node index.js"
+    "babel": "babel ./src --out-dir dist/"
   },
   "keywords": [
     "fe",

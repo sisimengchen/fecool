@@ -20,6 +20,7 @@ module.exports = declare(function (api, options, dirname) {
       strictMode = options.strictMode,
       noInterop = options.noInterop;
   return {
+    name: "tinytool",
     pre: function pre(file) {
       file.isTinytooljs = false;
       this.isTinytooljs = false;

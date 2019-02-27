@@ -7,12 +7,10 @@ var getOptions = require("./getOptions");
 
 module.exports = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
-    isModule: false,
     isES6Enabled: true,
     isReactEnabled: false
   };
-  var isModule = options.isModule,
-      isES6Enabled = options.isES6Enabled,
+  var isES6Enabled = options.isES6Enabled,
       isReactEnabled = options.isReactEnabled;
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   var babelOptions = {
@@ -27,9 +25,9 @@ module.exports = function () {
       targets: {
         browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"]
       },
-      modules: isModule ? false : "amd" // debug: true
+      modules: false // debug: true
 
-    }], isReactEnabled && [require("@babel/preset-react").default, {
+    }], [require("../babel-preset-amd")], isReactEnabled && [require("@babel/preset-react").default, {
       development: false,
       useBuiltIns: true
     }]].filter(Boolean),

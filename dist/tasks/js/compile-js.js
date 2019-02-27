@@ -36,23 +36,42 @@ function jsCompile() {
   })).pipe(printer(function (filepath) {
     return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-  .pipe(gulpif(function (file) {
-    var path = file.path,
-        contents = file.contents;
-    return !contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
-  }, babel(getBabelOptions({
-    isModule: false,
-    isES6Enabled: true,
-    isReactEnabled: false
-  })))).on("error", swallowError).pipe(gulpif(function (file) {
-    var path = file.path,
-        contents = file.contents;
-    return contents.toString("utf8", 0, 18).startsWith("/* @thirdmodule */");
-  }, babel(getBabelOptions({
-    isModule: true,
-    isES6Enabled: true,
-    isReactEnabled: false
-  })))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+  .pipe(babel(getBabelOptions())) // .pipe(
+  //   gulpif(
+  //     file => {
+  //       const { path, contents } = file;
+  //       return !contents
+  //         .toString("utf8", 0, 18)
+  //         .startsWith("/* @thirdmodule */");
+  //     },
+  //     babel(
+  //       getBabelOptions({
+  //         isModule: false,
+  //         isES6Enabled: true,
+  //         isReactEnabled: false
+  //       })
+  //     )
+  //   )
+  // )
+  // .on("error", swallowError)
+  // .pipe(
+  //   gulpif(
+  //     file => {
+  //       const { path, contents } = file;
+  //       return contents
+  //         .toString("utf8", 0, 18)
+  //         .startsWith("/* @thirdmodule */");
+  //     },
+  //     babel(
+  //       getBabelOptions({
+  //         isModule: true,
+  //         isES6Enabled: true,
+  //         isReactEnabled: false
+  //       })
+  //     )
+  //   )
+  // )
+  .on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

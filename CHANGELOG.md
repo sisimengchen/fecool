@@ -1,5 +1,13 @@
 # fecool changelog
 
+## 0.0.12
+
+### 删除/* @thirdmodule */标记
+
+  - 新建babel-preset-amd，替代@babel/preset-env内置的babel-plugin-transform-modules-amd功能（原有的不会判断是否已经是amd包，对于react这种已经打包成umd的会被二次包装）
+  - 优化getBabelOptions配置
+  - 优化js和jsx构建任务
+
 ## 0.0.11
 
 ### 配置文件解析增加错误提示

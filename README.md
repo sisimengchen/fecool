@@ -117,11 +117,10 @@ resolve.alias是用来为资源寻路增加一个目录的别名，key代表了�
 args这个对象会注入到到每一个构建输出js代码包里，当加载了代码包后，可以通过window.__args访问args这个对象的值。
 在fecool构建过程中，会给args自动插入两个属性：buildTimestamp（构建时间戳），env（构建环境）用来帮助开发者获取一些构建的必要基本信息
 
-##### 关于 /\* \@tinytooljs \*\/ 和 \/\* \@thirdmodule \*\/的使用
+##### 关于 /\* \@tinytooljs \*\/ 的使用
 
 这两个注释是针对js代码做的特殊标记。fecool解析到代码文件头几个字符是这俩个注释中的一个，都会触发特殊的构建条件。
 /* @tinytooljs */ 表示的是旧版tinytooljs工具的js代码，当检测到有这个注释的时候，系统会触发额外的构建流程，兼容tinytooljs所构建出的代码。
-/* @thirdmodule */ 表示的是已经是amd或者umd包的代码，当检测到有这个注释的时候，系统会触发额外的构建流程，避免@babel/preset-env在导出amd的时候出现的二次包装问题。
 
 ##### 关于开发服务器的使用
 

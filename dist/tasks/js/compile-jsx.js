@@ -37,8 +37,6 @@ function jsxCompile() {
     return "jsx\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
   .pipe(babel(getBabelOptions({
-    isModule: false,
-    isES6Enabled: true,
     isReactEnabled: true
   }))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
     sourceMappingURLPrefix: globalOptions.publicPath

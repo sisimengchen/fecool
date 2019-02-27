@@ -6,8 +6,7 @@ var _require = require("@babel/helper-plugin-utils"),
 module.exports = declare(function (api, opts) {
   api.assertVersion(7);
   var plugins = [];
-  plugins.push(require("./packages/babel-plugin-transform-modules-remove-strict"));
-  plugins.push(require("./packages/babel-plugin-transform-fecool"));
+  plugins.push(require("./packages/babel-plugin-transform-modules-amd"));
   return {
     plugins: plugins
   };

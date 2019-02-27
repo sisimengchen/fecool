@@ -24,8 +24,6 @@ function jsxCompile() {
     .pipe(
       babel(
         getBabelOptions({
-          isModule: false,
-          isES6Enabled: true,
           isReactEnabled: true
         })
       )

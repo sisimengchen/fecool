@@ -32,6 +32,7 @@ module.exports = declare((api, options) => {
 
   const { loose, allowTopLevelThis, strict, strictMode, noInterop } = options;
   return {
+    name: "transform-fecool",
     pre(file) {
       this.paramNameCaches = {};
       this.dependNameCaches = {};

@@ -6,6 +6,7 @@ module.exports = declare(api => {
   api.assertVersion(7);
 
   return {
+    name: "transform-modules-remove-strict",
     visitor: {
       Directive(path, { opts }) {
         if (!path.hub.file.isTinytooljs) return;

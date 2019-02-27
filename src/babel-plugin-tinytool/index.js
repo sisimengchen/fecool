@@ -9,6 +9,7 @@ module.exports = declare((api, options, dirname) => {
   api.assertVersion(7);
   const { loose, allowTopLevelThis, strict, strictMode, noInterop } = options;
   return {
+    name: "tinytool",
     pre(file) {
       file.isTinytooljs = false;
       this.isTinytooljs = false;
@@ -161,7 +162,7 @@ module.exports = declare((api, options, dirname) => {
           const isDefineCall = calleeName === "define";
           if (!isDefineCall) return;
           if (!t.isProgram(parent)) return;
-          const args = node.expression.arguments || []
+          const args = node.expression.arguments || [];
           let callback;
           callback = args[0] ? args[0] : undefined;
           if (!callback) return;

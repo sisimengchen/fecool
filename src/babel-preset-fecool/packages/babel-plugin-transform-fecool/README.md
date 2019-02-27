@@ -1,4 +1,4 @@
-# babel-plugin-transform-modules-amd
+# babel-plugin-transform-fecool
 
 fecool核心插件，要在@babel/preset-env在生成amd模块之后执行
 

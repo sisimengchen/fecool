@@ -299,7 +299,15 @@ function () {
   }, {
     key: "getModule",
     value: function getModule(filename) {
-      if (!filename) return undefined; // console.log(filename)
+      if (!filename) return undefined;
+
+      if (isURL(filename)) {
+        return {
+          filename: filename,
+          url: filename
+        };
+      } // console.log(filename)
+
 
       var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename); // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
 

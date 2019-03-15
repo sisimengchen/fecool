@@ -247,6 +247,12 @@ class Options {
    */
   getModule(filename) {
     if (!filename) return undefined;
+    if (isURL(filename)) {
+      return {
+        filename,
+        url: filename
+      };
+    }
     // console.log(filename)
     let hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
     // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
@@ -341,7 +347,11 @@ const getOptions = function(userOptions = {}) {
   if (instance) {
     return instance;
   } else {
-    const options = Object.assign({}, require("./defaultOptions.js"), userOptions);
+    const options = Object.assign(
+      {},
+      require("./defaultOptions.js"),
+      userOptions
+    );
     printer.debug("启动配置", options);
     instance = new Options(options);
     return instance;

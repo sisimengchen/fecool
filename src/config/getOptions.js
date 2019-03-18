@@ -48,7 +48,7 @@ class Options {
     this.imagemin = this.__options.imagemin || false;
     this.timestamp = this.__options.timestamp;
     this.buildTimestamp = this.timestamp || +new Date();
-    this.hasha = this.__options.hasha || true;
+    this.hasha = this.__options.hasha;
     this.args = this.__options.args || {};
     this.envCode = undefined;
   }

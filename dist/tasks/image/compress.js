@@ -29,7 +29,7 @@ function imageCompress() {
   }), imagemin.jpegtran({
     progressive: true
   }), imagemin.optipng({
-    optimizationLevel: 5
+    optimizationLevel: 3
   }), imagemin.svgo({
     plugins: [{
       cleanupIDs: false

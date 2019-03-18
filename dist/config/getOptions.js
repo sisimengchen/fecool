@@ -63,6 +63,7 @@ function () {
       this.imagemin = this.__options.imagemin || false;
       this.timestamp = this.__options.timestamp;
       this.buildTimestamp = this.timestamp || +new Date();
+      this.hasha = this.__options.hasha || true;
       this.args = this.__options.args || {};
       this.envCode = undefined;
     }
@@ -353,6 +354,7 @@ function () {
     key: "getHashaCode",
     value: function getHashaCode(filename) {
       if (!filename) return;
+      if (!this.hasha) return "";
       return hasha.fromFileSync(filename, {
         algorithm: "md5"
       }); // 生成hashcode

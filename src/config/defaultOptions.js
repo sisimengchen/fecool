@@ -26,6 +26,7 @@ const defaultOptions = {
     middleware: []
   },
   imagemin: false,
+  hasha: true,
   timestamp: undefined, // 指定资源构建的时间戳，为空则无
   args: {} // 构建出来的代码可以通过window.__args来获构建环境相关参数
 };

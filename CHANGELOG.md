@@ -1,5 +1,9 @@
 # fecool changelog
 
+## 0.0.18
+
+### 优化timestamp配置
+
 ## 0.0.16 && 0.0.17
 
 ### 增加hasha配置

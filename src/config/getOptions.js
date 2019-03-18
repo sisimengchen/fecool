@@ -166,7 +166,7 @@ class Options {
    * @param  {[String]} source    [资源绝对路径]
    * @return {[String]}           [资源编译后的url]
    */
-  getURL(source = "nosource") {
+  getURL(source = "nosource", timestamp) {
     let url;
     if (isURL(source)) {
       url = source;
@@ -174,7 +174,7 @@ class Options {
       url = source;
     } else if (isPath(source)) {
       url = `${this.publicPath}/${path.relative(this.sourceDir, source)}${
-        this.timestamp ? `?v=${this.timestamp}` : ""
+        timestamp ? `?v=${timestamp}` : ""
       }`;
     } else {
       url = source;
@@ -257,6 +257,7 @@ class Options {
     }
     // console.log(filename)
     let hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
+    let timestamp = this.timestamp;
     // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
     const ext = path.extname(filename);
     if (
@@ -265,6 +266,7 @@ class Options {
       ) > -1
     ) {
       hashCode = "";
+      timestamp = "";
     }
     let transformFilename = this.getTransformFilename(filename, hashCode);
     const module = {
@@ -272,7 +274,7 @@ class Options {
       hashCode,
       transformFilename,
       distFilename: this.mapEntry2Output(transformFilename),
-      url: this.getURL(transformFilename)
+      url: this.getURL(transformFilename, timestamp)
     };
     printer.debug("模块解析", filename, "==>", module);
     return module;

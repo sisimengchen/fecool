@@ -216,6 +216,7 @@ function () {
     key: "getURL",
     value: function getURL() {
       var source = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "nosource";
+      var timestamp = arguments.length > 1 ? arguments[1] : undefined;
       var url;
 
       if (isURL(source)) {
@@ -223,7 +224,7 @@ function () {
       } else if (isDataURI(source)) {
         url = source;
       } else if (isPath(source)) {
-        url = "".concat(this.publicPath, "/").concat(path.relative(this.sourceDir, source)).concat(this.timestamp ? "?v=".concat(this.timestamp) : "");
+        url = "".concat(this.publicPath, "/").concat(path.relative(this.sourceDir, source)).concat(timestamp ? "?v=".concat(timestamp) : "");
       } else {
         url = source;
       }
@@ -311,12 +312,14 @@ function () {
       } // console.log(filename)
 
 
-      var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename); // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
+      var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
+      var timestamp = this.timestamp; // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
 
       var ext = path.extname(filename);
 
       if ([".less", ".css", ".styl", ".js", ".jsx", ".html"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
+        timestamp = "";
       }
 
       var transformFilename = this.getTransformFilename(filename, hashCode);
@@ -325,7 +328,7 @@ function () {
         hashCode: hashCode,
         transformFilename: transformFilename,
         distFilename: this.mapEntry2Output(transformFilename),
-        url: this.getURL(transformFilename)
+        url: this.getURL(transformFilename, timestamp)
       };
       printer.debug("模块解析", filename, "==>", module);
       return module;

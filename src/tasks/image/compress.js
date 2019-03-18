@@ -12,7 +12,7 @@ const { getOptions } = require("../../config");
 const globalOptions = getOptions();
 
 function imageCompress() {
-  if (process.env.IMAGE_MIN == "0") {
+  if (!globalOptions.imagemin) {
     return Promise.resolve("the imageCompress is ignored");
   }
   return gulp

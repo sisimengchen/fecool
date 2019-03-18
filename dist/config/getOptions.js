@@ -60,6 +60,7 @@ function () {
         _this.alias[item] = path.isAbsolute(alia) ? alia : path.join(_this.context, alia);
       });
       this.moduleDirectory = this.__options.moduleDirectory || [];
+      this.imagemin = this.__options.imagemin || false;
       this.timestamp = this.__options.timestamp;
       this.buildTimestamp = this.timestamp || +new Date();
       this.args = this.__options.args || {};

@@ -45,6 +45,7 @@ class Options {
         : path.join(this.context, alia);
     });
     this.moduleDirectory = this.__options.moduleDirectory || [];
+    this.imagemin = this.__options.imagemin || false;
     this.timestamp = this.__options.timestamp;
     this.buildTimestamp = this.timestamp || +new Date();
     this.args = this.__options.args || {};

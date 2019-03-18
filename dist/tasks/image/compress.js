@@ -18,7 +18,7 @@ var _require = require("../../config"),
 var globalOptions = getOptions();
 
 function imageCompress() {
-  if (process.env.IMAGE_MIN == "0") {
+  if (!globalOptions.imagemin) {
     return Promise.resolve("the imageCompress is ignored");
   }
 

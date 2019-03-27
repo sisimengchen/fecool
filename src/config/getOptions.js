@@ -261,7 +261,7 @@ class Options {
     // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
     const ext = path.extname(filename);
     if (
-      [".less", ".css", ".styl", ".js", ".jsx", ".html"].indexOf(
+      [".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php"].indexOf(
         ext.toLocaleLowerCase()
       ) > -1
     ) {

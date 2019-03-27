@@ -124,7 +124,8 @@ args这个对象会注入到到每一个构建输出js代码包里，当加载�
 
 ##### 关于开发服务器的使用
 
-fecool内置browser-sync + http-proxy-middleware，支持访问代理配置。各个项目代理配置情况需要自定义，需要用http-proxy-middleware生成一个中间件，放到server.middleware中即可,具体配置请参考[browser-sync配置](https://www.browsersync.io/docs/optionsd)，[http-proxy-middleware配置](https://github.com/chimurai/http-proxy-middleware)。
+fecool内置browser-sync + http-proxy-middleware，支持访问代理配置。各个项目代理配置情况需要自定义，需要用http-proxy-middleware生成一个中间件，放到server.middleware中即可,具体配置请参考[browser-sync配置](https://www.browsersync.io/docs/options)，[http-proxy-middleware配置](https://github.com/chimurai/http-proxy-middleware)。
 
-当前版本的fecool同时支持ejs同步mock功能，当用开发服务器访问.ejs资源的时候，把通目录下的mock.mockjs文件作为js对象注入到ejs模板中。
+当前版本的fecool同时支持ejs同步mock功能，当用开发服务器访问.ejs资源的时候，把通目录下的mock.ejsjson文件作为js对象注入到ejs模板中。
+v0.0.19版本的fecool支持php同步mock功能，当用开发服务器访问.php资源的时候，把通目录下的mock.phpjson文件作为php对象注入到php模板中。
 

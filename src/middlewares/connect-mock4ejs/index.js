@@ -12,7 +12,11 @@ module.exports = function(options) {
     const { ext } = path.parse(req.url);
     if (ext && ext.toLocaleLowerCase() === ".ejs") {
       const filePath = path.join(globalOptions.distDir, req.url);
-      const mockPath = path.join(globalOptions.distDir, req.url, "../mock.mockjs");
+      const mockPath = path.join(
+        globalOptions.distDir,
+        req.url,
+        "../mock.ejsjson"
+      );
       ejs.renderFile(filePath, require(mockPath), options, function(err, html) {
         res.end(html);
       });
@@ -21,11 +25,3 @@ module.exports = function(options) {
     }
   };
 };
-
-// const ls = spawn("ls", ["-lh", globalOptions.distDir]);
-// ls.stdout.on("data", data => {
-//   res.end(`stdout: ${data}`);
-// });
-// ls.on("close", code => {
-//   res.end(`子进程退出码：${code}`);
-// });

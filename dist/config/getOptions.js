@@ -317,7 +317,7 @@ function () {
 
       var ext = path.extname(filename);
 
-      if ([".less", ".css", ".styl", ".js", ".jsx", ".html"].indexOf(ext.toLocaleLowerCase()) > -1) {
+      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
         timestamp = "";
       }

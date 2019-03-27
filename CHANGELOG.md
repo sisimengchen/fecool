@@ -1,5 +1,9 @@
 # fecool changelog
 
+## 0.0.19
+
+### 增加php同步mock功能
+
 ## 0.0.18
 
 ### 优化timestamp配置

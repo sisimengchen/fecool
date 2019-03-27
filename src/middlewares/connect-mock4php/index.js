@@ -51,7 +51,7 @@ module.exports = function(options) {
                 res.end(data.toString());
               });
               php.on("close", code => {
-                // fs.unlinkSync(outPath);
+                fs.unlinkSync(outPath);
               });
             }
           });

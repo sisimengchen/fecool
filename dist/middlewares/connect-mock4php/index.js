@@ -56,7 +56,8 @@ module.exports = function (options) {
                 printer.error(error.toString());
                 res.end(data.toString());
               });
-              php.on("close", function (code) {// fs.unlinkSync(outPath);
+              php.on("close", function (code) {
+                fs.unlinkSync(outPath);
               });
             }
           });

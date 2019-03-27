@@ -71,6 +71,7 @@ const config = {
       utils: "./src/utils"
     }
   },
+  template: "php", // 项目的模板，默认ejs 目前只能针对配置的模板做mock
   server: { // browser-sync 配置 具体请参考 https://www.browsersync.io/docs/options
     port: 8080,
     single: true, // 启用单页面模式

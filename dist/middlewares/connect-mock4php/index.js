@@ -18,30 +18,30 @@ var _require3 = require("../../util"),
 var globalOptions = getOptions();
 var mockStr = fs.readFileSync(path.resolve(__dirname, "./mock.php"), "utf8") + "\n";
 
-module.exports = function (options) {
-  if (options == null) {
-    options = {};
-  }
-
+module.exports = function () {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   return function (req, res, next) {
-    var _path$parse = path.parse(req.url),
+    var pathname = req._parsedUrl.pathname;
+    var search = req._parsedUrl.search;
+
+    var _path$parse = path.parse(pathname),
         ext = _path$parse.ext;
 
     if (ext && ext.toLocaleLowerCase() === ".php") {
-      var codePath = path.join(globalOptions.distDir, req.url); // 获取要访问的文件
+      var fileName = path.join(globalOptions.distDir, pathname); // 获取要访问的文件
 
-      var mockPath = path.join(codePath, "../mock.phpjson");
-      fs.readFile(codePath, "utf8", function (error, data) {
+      var mockFilename = path.join(fileName, "../mock.phpjson");
+      fs.readFile(fileName, "utf8", function (error, data) {
         if (error) {
           printer.error(error);
           res.end(error.toString());
           throw error;
         } else {
-          var hashacode = hasha.fromFileSync(codePath, {
+          var hashacode = hasha.fromFileSync(fileName, {
             algorithm: "md5"
           }).substr(0, 8);
-          var outPath = codePath + hashacode;
-          var newContent = mockStr.replace(/\$MOCK_PATH\$/g, mockPath).replace(/\$MOCK_TIMESTAMP\$/g, "$_data" + hashacode) + data;
+          var outPath = fileName + hashacode;
+          var newContent = mockStr.replace(/\$MOCK_PATH\$/g, mockFilename).replace(/\$MOCK_TIMESTAMP\$/g, "$_data" + hashacode) + data;
           fs.writeFile(outPath, newContent, "utf8", function (error) {
             if (error) {
               printer.error(error);
@@ -50,6 +50,7 @@ module.exports = function (options) {
             } else {
               var php = spawn("php", ["-f", outPath]);
               php.stdout.on("data", function (data) {
+                console.log(data.toString());
                 res.end(data.toString());
               });
               php.stderr.on("data", function (error) {

@@ -71,7 +71,7 @@ function jsCompile() {
   //     )
   //   )
   // )
-  .on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+  .on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

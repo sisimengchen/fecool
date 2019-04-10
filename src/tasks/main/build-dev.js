@@ -7,14 +7,15 @@ const {
   jsCompile,
   jsxCompile,
   commonjsConcat,
-  htmlCompile
+  htmlCompile,
+  phtmlCompile
 } = require("./index.js");
 
 const devBuild = series(
   parallel(move),
   parallel(cssCompile, stylusCompile, lessCompile),
   parallel(jsCompile, jsxCompile, commonjsConcat),
-  parallel(htmlCompile)
+  parallel(htmlCompile, phtmlCompile)
 );
 
 module.exports = devBuild;

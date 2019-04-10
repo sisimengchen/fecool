@@ -1,8 +1,5 @@
-module.exports = function(options) {
+module.exports = function(options = {}) {
   var moment, parse, url;
-  if (options == null) {
-    options = {};
-  }
   url = require("url");
   moment = require("moment");
   options.date || (options.date = "YY.MM.DD HH:mm:ss");

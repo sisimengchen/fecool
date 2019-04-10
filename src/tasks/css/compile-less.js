@@ -38,7 +38,7 @@ function lessCompile() {
     .pipe(
       gulpif(
         globalOptions.isDevelopENV(),
-        sourcemaps.write(globalOptions.sourceMapDirname, {
+        sourcemaps.write(globalOptions.sourceMapDirName, {
           sourceMappingURLPrefix: globalOptions.publicPath
         })
       )

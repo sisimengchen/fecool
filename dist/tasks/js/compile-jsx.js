@@ -38,7 +38,7 @@ function jsxCompile() {
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
   .pipe(babel(getBabelOptions({
     isReactEnabled: true
-  }))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+  }))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

@@ -4,20 +4,18 @@ const { getOptions } = require("../../config");
 const globalOptions = getOptions();
 const ejs = require("ejs");
 
-module.exports = function(options) {
-  if (options == null) {
-    options = {};
-  }
+module.exports = function(options = {}) {
   return function(req, res, next) {
-    const { ext } = path.parse(req.url);
+    const pathname = req._parsedUrl.pathname;
+    const search = req._parsedUrl.search;
+    const { ext, base, name } = path.parse(pathname); // ext => '.phtml'  base => 'xxx.phtml'
     if (ext && ext.toLocaleLowerCase() === ".ejs") {
-      const filePath = path.join(globalOptions.distDir, req.url);
-      const mockPath = path.join(
-        globalOptions.distDir,
-        req.url,
-        "../mock.ejsjson"
-      );
-      ejs.renderFile(filePath, require(mockPath), options, function(err, html) {
+      const fileName = path.join(globalOptions.distDir, pathname);
+      const mockFilename = path.join(fileName, "../mock.ejsjson");
+      ejs.renderFile(fileName, require(mockFilename), options, function(
+        err,
+        html
+      ) {
         res.end(html);
       });
     } else {

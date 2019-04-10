@@ -35,7 +35,7 @@ class Options {
       ? output.common
       : path.join(this.context, output.common);
     this.publicPath = output.publicPath;
-    this.sourceMapDirname = "./.sourcemaps";
+    this.sourceMapDirName = "./.sourcemaps";
     this.alias = {};
     Object.keys(resolve.alias).forEach((item, index) => {
       this.isAliasOn = true;
@@ -261,9 +261,17 @@ class Options {
     // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
     const ext = path.extname(filename);
     if (
-      [".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php"].indexOf(
-        ext.toLocaleLowerCase()
-      ) > -1
+      [
+        ".less",
+        ".css",
+        ".styl",
+        ".js",
+        ".jsx",
+        ".html",
+        ".ejs",
+        ".php",
+        ".phtml"
+      ].indexOf(ext.toLocaleLowerCase()) > -1
     ) {
       hashCode = "";
       timestamp = "";
@@ -328,7 +336,7 @@ class Options {
    * @return {[object]}           [配置对象]
    */
   server() {
-    const { server, template } = this.__options;
+    const { server } = this.__options;
     this.server = Object.assign({}, server);
     this.server.server = this.server.server || {};
     this.server.server.baseDir = this.distDir;
@@ -336,12 +344,30 @@ class Options {
       path.resolve(this.distDir, "**", `*.*`)
     ];
     this.server.middleware = this.server.middleware || [];
-    this.server.middleware = [
-      require("../middlewares/connect-logger")(),
-      template && require(`../middlewares/connect-mock4${template}`)()
-    ]
-      .filter(Boolean)
-      .concat(this.server.middleware);
+    this.server.middleware = this.server.middleware
+      .map((item, index) => {
+        let middleware, options;
+        if (Object.prototype.toString.call(item) === "[object Array]") {
+          [middleware, options = {}] = item;
+        } else {
+          middleware = item;
+        }
+        if (Object.prototype.toString.call(middleware) == "[object String]") {
+          try {
+            middleware = require(`../middlewares/${middleware}`)(options);
+          } catch (error) {
+            printer.error(error);
+            middleware = false
+          } finally {}
+        } else if (
+          Object.prototype.toString.call(middleware) == "[object Function]"
+        ) {
+          middleware = middleware(options);
+        }
+        return middleware;
+      })
+      .filter(Boolean);
+    this.server.middleware.unshift(require("../middlewares/connect-logger")());
     return this.server;
   }
 }

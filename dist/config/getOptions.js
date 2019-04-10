@@ -1,5 +1,13 @@
 "use strict";
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -52,7 +60,7 @@ function () {
       this.distDir = path.isAbsolute(output.path) ? output.path : path.join(this.context, output.path);
       this.distCommonDir = path.isAbsolute(output.common) ? output.common : path.join(this.context, output.common);
       this.publicPath = output.publicPath;
-      this.sourceMapDirname = "./.sourcemaps";
+      this.sourceMapDirName = "./.sourcemaps";
       this.alias = {};
       Object.keys(resolve.alias).forEach(function (item, index) {
         _this.isAliasOn = true;
@@ -317,7 +325,7 @@ function () {
 
       var ext = path.extname(filename);
 
-      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php"].indexOf(ext.toLocaleLowerCase()) > -1) {
+      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
         timestamp = "";
       }
@@ -395,15 +403,39 @@ function () {
   }, {
     key: "server",
     value: function server() {
-      var _this$__options2 = this.__options,
-          server = _this$__options2.server,
-          template = _this$__options2.template;
+      var server = this.__options.server;
       this.server = Object.assign({}, server);
       this.server.server = this.server.server || {};
       this.server.server.baseDir = this.distDir;
       this.server.files = this.server.files || [path.resolve(this.distDir, "**", "*.*")];
       this.server.middleware = this.server.middleware || [];
-      this.server.middleware = [require("../middlewares/connect-logger")(), template && require("../middlewares/connect-mock4".concat(template))()].filter(Boolean).concat(this.server.middleware);
+      this.server.middleware = this.server.middleware.map(function (item, index) {
+        var middleware, options;
+
+        if (Object.prototype.toString.call(item) === "[object Array]") {
+          var _item = _slicedToArray(item, 2);
+
+          middleware = _item[0];
+          var _item$ = _item[1];
+          options = _item$ === void 0 ? {} : _item$;
+        } else {
+          middleware = item;
+        }
+
+        if (Object.prototype.toString.call(middleware) == "[object String]") {
+          try {
+            middleware = require("../middlewares/".concat(middleware))(options);
+          } catch (error) {
+            printer.error(error);
+            middleware = false;
+          } finally {}
+        } else if (Object.prototype.toString.call(middleware) == "[object Function]") {
+          middleware = middleware(options);
+        }
+
+        return middleware;
+      }).filter(Boolean);
+      this.server.middleware.unshift(require("../middlewares/connect-logger")());
       return this.server;
     }
   }]);

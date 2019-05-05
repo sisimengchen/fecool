@@ -381,6 +381,7 @@ class Options {
     this.server.middleware = this.server.middleware
       .map((item, index) => {
         let middleware, options;
+        console.log('serverserverserverserver', Object.prototype.toString.call(item))
         if (Object.prototype.toString.call(item) === "[object Array]") {
           [middleware, options = {}] = item;
         } else {
@@ -394,10 +395,6 @@ class Options {
             middleware = false;
           } finally {
           }
-        } else if (
-          Object.prototype.toString.call(middleware) == "[object Function]"
-        ) {
-          middleware = middleware(options);
         }
         return middleware;
       })

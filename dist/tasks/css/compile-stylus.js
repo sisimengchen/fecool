@@ -38,7 +38,7 @@ var globalOptions = getOptions();
 
 function stylusCompile() {
   return gulp.src(globalOptions.getGulpSrc("styl")).pipe(changed(globalOptions.getGulpDest(), {
-    extension: ".css"
+    extension: ".styl.css"
   })).pipe(printer(function (filepath) {
     return "styl\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(stylus({

@@ -40,7 +40,7 @@ var globalOptions = getOptions();
 
 function lessCompile() {
   return gulp.src(globalOptions.getGulpSrc("less")).pipe(changed(globalOptions.getGulpDest(), {
-    extension: ".css"
+    extension: ".less.css"
   })).pipe(printer(function (filepath) {
     return "less\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap

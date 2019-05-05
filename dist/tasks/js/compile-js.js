@@ -31,8 +31,9 @@ var globalOptions = getOptions();
 
 function jsCompile() {
   return gulp.src(globalOptions.getGulpSrc("js", false, true)) // 对于非common目录下的所有.js资源执行
-  // .pipe(changed(globalOptions.getGulpDest(), { extension: ".js" }))
-  .pipe(printer(function (filepath) {
+  .pipe(changed(globalOptions.getGulpDest(), {
+    extension: ".js"
+  })).pipe(printer(function (filepath) {
     return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
   .pipe(babel(getBabelOptions())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {

@@ -19,7 +19,7 @@ function jsCompile() {
   return (
     gulp
       .src(globalOptions.getGulpSrc("js", false, true)) // 对于非common目录下的所有.js资源执行
-      // .pipe(changed(globalOptions.getGulpDest(), { extension: ".js" }))
+      .pipe(changed(globalOptions.getGulpDest(), { extension: ".js" }))
       .pipe(printer(filepath => `js编译任务 ${filepath}`))
       .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
       .pipe(babel(getBabelOptions()))

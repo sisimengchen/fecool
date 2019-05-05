@@ -447,6 +447,7 @@ function () {
       this.server.middleware = this.server.middleware || [];
       this.server.middleware = this.server.middleware.map(function (item, index) {
         var middleware, options;
+        console.log('serverserverserverserver', Object.prototype.toString.call(item));
 
         if (Object.prototype.toString.call(item) === "[object Array]") {
           var _item = _slicedToArray(item, 2);
@@ -465,8 +466,6 @@ function () {
             printer.error(error);
             middleware = false;
           } finally {}
-        } else if (Object.prototype.toString.call(middleware) == "[object Function]") {
-          middleware = middleware(options);
         }
 
         return middleware;

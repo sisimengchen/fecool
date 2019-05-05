@@ -55,9 +55,14 @@ function () {
       var _this = this;
 
       var _this$__options = this.__options,
-          entry = _this$__options.entry,
-          output = _this$__options.output,
-          resolve = _this$__options.resolve;
+          _this$__options$entry = _this$__options.entry,
+          entry = _this$__options$entry === void 0 ? {} : _this$__options$entry,
+          _this$__options$outpu = _this$__options.output,
+          output = _this$__options$outpu === void 0 ? {} : _this$__options$outpu,
+          _this$__options$resol = _this$__options.resolve,
+          resolve = _this$__options$resol === void 0 ? {} : _this$__options$resol,
+          _this$__options$optim = _this$__options.optimization,
+          optimization = _this$__options$optim === void 0 ? {} : _this$__options$optim;
       this.mode = options.mode ? options.mode : "production";
       this.context = path.isAbsolute(options.context) ? options.context : path.join(process.cwd(), options.context);
       this.sourceDir = path.isAbsolute(entry.path) ? entry.path : path.join(this.context, entry.path);
@@ -73,11 +78,12 @@ function () {
         _this.alias[item] = path.isAbsolute(alia) ? alia : path.join(_this.context, alia);
       });
       this.moduleDirectory = this.__options.moduleDirectory || [];
-      this.imagemin = this.__options.imagemin || false;
-      this.timestamp = this.__options.timestamp;
+      this.imagemin = optimization.imagemin || this.__options.imagemin || false;
+      this.retainExtname = optimization.retainExtname || this.__options.retainExtname || false;
+      this.timestamp = output.timestamp || this.__options.timestamp;
       this.buildTimestamp = this.timestamp || +new Date();
-      this.hasha = this.__options.hasha;
-      this.args = this.__options.args || {};
+      this.hasha = output.hasha || this.__options.hasha || true;
+      this.args = output.args || this.__options.args || {};
       this.envCode = undefined;
     }
     /**
@@ -377,10 +383,10 @@ function () {
 
         if (ext === ".jsx") {
           // .jsx ==> .jsx.js
-          ext = "".concat(ext, ".js");
+          ext = this.retainExtname ? "".concat(ext, ".js") : ".js";
         } else if (ext === ".less" || ext === ".styl") {
           // .less|.styl ==> .less|.styl.css
-          ext = "".concat(ext, ".css");
+          ext = this.retainExtname ? "".concat(ext, ".css") : ".css";
         }
 
         if (hashCode) {
@@ -447,7 +453,7 @@ function () {
       this.server.middleware = this.server.middleware || [];
       this.server.middleware = this.server.middleware.map(function (item, index) {
         var middleware, options;
-        console.log('serverserverserverserver', Object.prototype.toString.call(item));
+        console.log("serverserverserverserver", Object.prototype.toString.call(item));
 
         if (Object.prototype.toString.call(item) === "[object Array]") {
           var _item = _slicedToArray(item, 2);

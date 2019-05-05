@@ -22,7 +22,12 @@ class Options {
   }
 
   init(options) {
-    const { entry, output, resolve } = this.__options;
+    const {
+      entry = {},
+      output = {},
+      resolve = {},
+      optimization = {}
+    } = this.__options;
     this.mode = options.mode ? options.mode : "production";
     this.context = path.isAbsolute(options.context)
       ? options.context
@@ -50,11 +55,13 @@ class Options {
         : path.join(this.context, alia);
     });
     this.moduleDirectory = this.__options.moduleDirectory || [];
-    this.imagemin = this.__options.imagemin || false;
-    this.timestamp = this.__options.timestamp;
+    this.imagemin = optimization.imagemin || this.__options.imagemin || false;
+    this.retainExtname =
+      optimization.retainExtname || this.__options.retainExtname || false;
+    this.timestamp = output.timestamp || this.__options.timestamp;
     this.buildTimestamp = this.timestamp || +new Date();
-    this.hasha = this.__options.hasha;
-    this.args = this.__options.args || {};
+    this.hasha = output.hasha || this.__options.hasha || true;
+    this.args = output.args || this.__options.args || {};
     this.envCode = undefined;
   }
 
@@ -320,10 +327,10 @@ class Options {
       let ext = path.extname(filename);
       if (ext === ".jsx") {
         // .jsx ==> .jsx.js
-        ext = `${ext}.js`;
+        ext = this.retainExtname ? `${ext}.js` : ".js";
       } else if (ext === ".less" || ext === ".styl") {
         // .less|.styl ==> .less|.styl.css
-        ext = `${ext}.css`;
+        ext = this.retainExtname ? `${ext}.css` : ".css";
       }
       if (hashCode) {
         filename = extname(filename, `.${hashCode}${ext}`);
@@ -381,7 +388,10 @@ class Options {
     this.server.middleware = this.server.middleware
       .map((item, index) => {
         let middleware, options;
-        console.log('serverserverserverserver', Object.prototype.toString.call(item))
+        console.log(
+          "serverserverserverserver",
+          Object.prototype.toString.call(item)
+        );
         if (Object.prototype.toString.call(item) === "[object Array]") {
           [middleware, options = {}] = item;
         } else {

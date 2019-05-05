@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * @file 构建默认配置
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 var defaultOptions = {
   mode: "production",
   debug: false,

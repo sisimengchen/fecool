@@ -15,7 +15,9 @@ var _require2 = require("../../util"),
 var _require3 = require("@babel/core"),
     template = _require3.template;
 
-var codeWrapper = template("\n  var NAME = _interopRequireDefault('VALUE')\n");
+var generate = require("@babel/generator").default;
+
+var codeWrapper = template("\n  define('NAME', function() {\n    return 'VALUE';\n  })\n");
 var defaultOptions = {
   minify: false
 };
@@ -33,52 +35,51 @@ module.exports = function (_ref) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  var code, source;
+  var module = {},
+      source;
 
   try {
-    var resourcePath = globalOptions.resolve(dependName, filename);
-    source = fs.readFileSync(resourcePath, "utf-8");
-    source = source.replace(getOptions.urlReg, function (match, p1) {
-      // 针对#url做寻路
-      var p2 = p1.replace(/\#[^\#]+$/, "");
-      var p3 = globalOptions.resolve(p2, resourcePath);
-      var module = globalOptions.getModule(p3); // 生成模块对象
+    if (dependName != "exports") {
+      var resourcePath = globalOptions.resolve(dependName, filename);
+      source = fs.readFileSync(resourcePath, "utf8");
+      source = source.replace(getOptions.urlReg, function (match, p1) {
+        // 针对#url做寻路
+        var p2 = p1.replace(/\#[^\#]+$/, "");
+        var p3 = globalOptions.resolve(p2, resourcePath);
+        var module = globalOptions.getModule(p3); // 生成模块对象
 
-      return "\"".concat(module.url, "\"");
-    });
-
-    if (options.minify) {
-      source = minify(source, {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true
+        return "\"".concat(module.url, "\"");
       });
-    } // 这里需要补充处理#url的逻辑
 
-  } catch (error) {
-    printer.error(error);
-  } finally {}
+      if (options.minify) {
+        source = minify(source, {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true
+        });
+      }
 
-  try {
-    if (source) {
-      code = codeWrapper({
-        NAME: paramName,
+      module = globalOptions.getModule(resourcePath, ".js"); // 生成模块对象
+
+      var ast = codeWrapper({
+        NAME: module.url || dependName,
         VALUE: source
+      });
+      var code = generate(ast).code;
+      fs.writeFile(module.distFilename, code, "utf8", function (error) {
+        if (error) throw err;
       });
     }
   } catch (error) {
     printer.error(error);
-  }
+  } finally {}
 
-  return {
-    acitve: false,
-    code: code
-  };
+  return module;
 };

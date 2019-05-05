@@ -65,7 +65,6 @@ module.exports = function (_ref) {
   }
 
   return {
-    acitve: false,
     code: code
   };
 }; // 由于图片压缩需要借助gulp来执行，因此resolve步骤可以从dist中取，需要优化

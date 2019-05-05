@@ -22,7 +22,7 @@ var rules = [{
   options: {}
 }, {
   name: "style-loader",
-  test: /\.css$/,
+  test: /\.(css|less|styl)(\?.*)?$/,
   loader: require("../../../loader/style-loader"),
   options: {}
 }];

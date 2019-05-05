@@ -1,8 +1,9 @@
 /**
  * @file less编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
+const nodePath = require("path");
 const gulp = require("gulp");
 const gulpif = require("gulp-if");
 const less = require("gulp-less");
@@ -47,10 +48,8 @@ function lessCompile() {
       rename(function(path, file) {
         if (path.extname == ".css") {
           const module = globalOptions.getModule(extname(file.path, ".less"));
-          const hashCode = module.hashCode;
-          path.basename = hashCode
-            ? `${path.basename}.${hashCode}`
-            : path.basename;
+          const { distFilename } = module;
+          path.basename = nodePath.basename(distFilename, ".css");
         }
       })
     )

@@ -18,6 +18,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+/**
+ * @file 配置生成器
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 var path = require("path");
 
 var _resolve = require("resolve");
@@ -303,13 +308,15 @@ function () {
       return source;
     }
     /**
-     * 根据文件名获取模块信息
-     * @param {*} filename
+     * [根据文件名获取模块信息]
+     * @param  {[String]} filename   [文件名]
+     * @param  {[String]} supplyExt  [强制后缀名]
+     * @return {[String]}            [模块信息]
      */
 
   }, {
     key: "getModule",
-    value: function getModule(filename) {
+    value: function getModule(filename, supplyExt) {
       if (!filename) return undefined;
 
       if (isURL(filename)) {
@@ -317,50 +324,79 @@ function () {
           filename: filename,
           url: filename
         };
-      } // console.log(filename)
-
+      }
 
       var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
-      var timestamp = this.timestamp; // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
-
-      var ext = path.extname(filename);
+      var timestamp = this.timestamp;
+      var ext = path.extname(filename); // 先把这些的hash干掉，这里以后需要做规划
 
       if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
         timestamp = "";
       }
 
-      var transformFilename = this.getTransformFilename(filename, hashCode);
+      var transformFilename = this.getTransformFilename(filename, hashCode, supplyExt);
       var module = {
         filename: filename,
+        // 源文件名
         hashCode: hashCode,
+        // 源文件名hashcode
         transformFilename: transformFilename,
+        // 转换文件名（基础路径还是在源文件路径下，不会真实落入文件系统）
         distFilename: this.mapEntry2Output(transformFilename),
-        url: this.getURL(transformFilename, timestamp)
+        // 目标文件名
+        distFilenameRaw: this.mapEntry2Output(this.getTransformFilename(filename, hashCode)),
+        // 目标文件名不会被supplyExt影响
+        url: this.getURL(transformFilename, timestamp) // 资源url
+
       };
       printer.debug("模块解析", filename, "==>", module);
       return module;
     }
+    /**
+     * [获取转换后的文件名]
+     * @param  {[String]} filename   [文件名]
+     * @param  {[String]} hashCode   [hashcode]
+     * @param  {[String]} supplyExt  [强制后缀名]
+     * @return {[String]}            [规范后的依赖值]
+     */
+
   }, {
     key: "getTransformFilename",
-    value: function getTransformFilename(filename, hashCode) {
+    value: function getTransformFilename(filename, hashCode, supplyExt) {
       if (!filename) return undefined;
-      var ext = path.extname(filename);
 
-      if (ext === ".jsx") {
-        ext = ".js";
-      } else if (ext === ".less" || ext === ".styl") {
-        ext = ".css";
-      }
-
-      if (hashCode) {
-        filename = extname(filename, ".".concat(hashCode).concat(ext));
+      if (supplyExt) {
+        if (hashCode) {
+          filename = "".concat(filename, ".").concat(hashCode).concat(supplyExt);
+        } else {
+          filename = "".concat(filename).concat(supplyExt);
+        }
       } else {
-        filename = extname(filename, ext);
+        var ext = path.extname(filename);
+
+        if (ext === ".jsx") {
+          // .jsx ==> .jsx.js
+          ext = "".concat(ext, ".js");
+        } else if (ext === ".less" || ext === ".styl") {
+          // .less|.styl ==> .less|.styl.css
+          ext = "".concat(ext, ".css");
+        }
+
+        if (hashCode) {
+          filename = extname(filename, ".".concat(hashCode).concat(ext));
+        } else {
+          filename = extname(filename, ext);
+        }
       }
 
       return filename;
     }
+    /**
+     * 获取文件hashcode
+     * @param {*} filename
+     */
+
   }, {
     key: "getHashaCode",
     value: function getHashaCode(filename) {

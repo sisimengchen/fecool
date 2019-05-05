@@ -1,3 +1,8 @@
+/**
+ * @file 构建默认配置
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const defaultOptions = {
   mode: "production",
   debug: false,

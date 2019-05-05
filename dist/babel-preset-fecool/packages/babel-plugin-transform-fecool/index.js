@@ -52,6 +52,7 @@ module.exports = declare(function (api, options) {
     pre: function pre(file) {
       this.paramNameCaches = {};
       this.dependNameCaches = {};
+      this.dependCodeCaches = {};
     },
     visitor: {
       CallExpression: {
@@ -131,14 +132,15 @@ module.exports = declare(function (api, options) {
                 getPackage().addDependency(moduleName4Package, result.transformFilename);
               }
 
-              if (result.acitve) {
-                item.value = result.url || item.value;
-              } else {
+              if (result.code) {
                 _this.paramNameCaches[paramName + ""] = true;
                 _this.dependNameCaches[paramName + ""] = dependName;
+                _this.dependCodeCaches[paramName + ""] = result.code;
+                return false;
+              } else {
+                item.value = result.url || item.value;
+                return true;
               }
-
-              return result.acitve;
             });
             callback.params = callback.params.filter(function (item) {
               var paramName = item.name;
@@ -156,9 +158,10 @@ module.exports = declare(function (api, options) {
 
               if (result.acitve) {
                 item.value = result.url || item.value;
+                return true;
+              } else {
+                return false;
               }
-
-              return result.acitve;
             });
           }
 
@@ -178,10 +181,10 @@ module.exports = declare(function (api, options) {
           if (!this.paramNameCaches[left.name + ""]) return;
           if (right.callee.name != INTEROP_REQUIRE_DEFAULT) return;
           var dependName = this.dependNameCaches[left.name + ""];
-          var result = createCode.call(this, dependName, left.name);
+          var dependCode = this.dependCodeCaches[left.name + ""];
 
-          if (result.code) {
-            path.replaceWith(result.code);
+          if (dependName && dependCode) {
+            path.replaceWith(dependCode);
           }
         }
       }

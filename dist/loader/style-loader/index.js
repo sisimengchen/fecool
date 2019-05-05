@@ -13,7 +13,9 @@ var _require2 = require("../../util"),
 var _require3 = require("@babel/core"),
     template = _require3.template;
 
-var codeWrapper = template("\n  var NAME = _interopRequireDefault((function(style) {\n    var useCount = 0;\n\n    var headElement;\n    var firstLinkElement;\n    var styleElement;\n\n    function use() {\n      if (useCount++ > 0) {\n        return;\n      }\n\n      if (!headElement) {\n        headElement = document.head || document.getElementsByTagName('head')[0];\n      }\n\n      if (!firstLinkElement) {\n        var linkElements = headElement.getElementsByTagName('link');\n        for (var i = 0, l = linkElements.length; i < l; ++i) {\n          if (linkElements[i].rel === 'stylesheet') {\n            firstLinkElement = linkElements[i];\n            break;\n          }\n        }\n      }\n\n      if (!styleElement) {\n        styleElement = document.createElement('style');\n        firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);\n        styleElement.setAttribute('type', 'text/css');\n        // styleElement.setAttribute('data-src', '<%= src%>');\n        if (styleElement.styleSheet) {\n          styleElement.styleSheet.cssText = style;\n        } else {\n          styleElement.appendChild(document.createTextNode(style));\n        }\n      } else {\n        firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);\n      }\n    }\n\n    function unuse() {\n      if (useCount === 0) {\n        return;\n      }\n\n      if (--useCount === 0) {\n        headElement.removeChild(styleElement);\n      }\n    }\n\n    return {\n      use: use,\n      unuse: unuse\n    };\n  })('VALUE'))\n");
+var generate = require("@babel/generator").default;
+
+var codeWrapper = template("\n  define('NAME', function() {\n    return (function(style) {\n      var useCount = 0;\n  \n      var headElement;\n      var firstLinkElement;\n      var styleElement;\n  \n      function use() {\n        if (useCount++ > 0) {\n          return;\n        }\n  \n        if (!headElement) {\n          headElement = document.head || document.getElementsByTagName('head')[0];\n        }\n  \n        if (!firstLinkElement) {\n          var linkElements = headElement.getElementsByTagName('link');\n          for (var i = 0, l = linkElements.length; i < l; ++i) {\n            if (linkElements[i].rel === 'stylesheet') {\n              firstLinkElement = linkElements[i];\n              break;\n            }\n          }\n        }\n  \n        if (!styleElement) {\n          styleElement = document.createElement('style');\n          firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);\n          styleElement.setAttribute('type', 'text/css');\n          // styleElement.setAttribute('data-src', '<%= src%>');\n          if (styleElement.styleSheet) {\n            styleElement.styleSheet.cssText = style;\n          } else {\n            styleElement.appendChild(document.createTextNode(style));\n          }\n        } else {\n          firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);\n        }\n      }\n  \n      function unuse() {\n        if (useCount === 0) {\n          return;\n        }\n  \n        if (--useCount === 0) {\n          headElement.removeChild(styleElement);\n        }\n      }\n  \n      return {\n        use: use,\n        unuse: unuse\n      };\n    })('VALUE')\n  })\n");
 var defaultOptions = {};
 /**
  * [样式表文件依赖处理器]
@@ -28,28 +30,27 @@ module.exports = function (_ref, options) {
       filename = _ref.filename;
   var globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  var code, source;
+  var module = {},
+      source;
 
   try {
-    var resourcePath = globalOptions.resolve(dependName, filename);
-    source = fs.readFileSync(resourcePath, "utf-8");
-  } catch (error) {
-    printer.error(error);
-  } finally {}
+    if (dependName != "exports") {
+      var resourcePath = globalOptions.resolve(dependName, filename);
+      module = globalOptions.getModule(resourcePath, ".js"); // 生成模块对象
 
-  try {
-    if (source) {
-      code = codeWrapper({
-        NAME: paramName,
+      source = fs.readFileSync(module.distFilenameRaw, "utf8");
+      var ast = codeWrapper({
+        NAME: module.url || dependName,
         VALUE: source
+      });
+      var code = generate(ast).code;
+      fs.writeFile(module.distFilename, code, "utf8", function (error) {
+        if (error) throw err;
       });
     }
   } catch (error) {
     printer.error(error);
-  }
+  } finally {}
 
-  return {
-    acitve: false,
-    code: code
-  };
+  return module;
 }; // 由于less，scss，styl编译需要借助gulp来执行，因此resolve步骤可以从dist中取，需要优化

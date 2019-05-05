@@ -19,8 +19,5 @@ module.exports = function({ dependName, paramName, filename }, options = {}) {
     printer.error(error);
   } finally {
   }
-  return {
-    acitve: true,
-    ...module
-  };
+  return module;
 };

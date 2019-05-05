@@ -1,3 +1,8 @@
+/**
+ * @file 生产环境监听构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const { watch } = require("gulp");
 const { getOptions } = require("../../config");
 const devBuild = require("./build-dev");

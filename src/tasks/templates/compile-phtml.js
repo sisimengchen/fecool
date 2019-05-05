@@ -1,6 +1,6 @@
 /**
- * @file html编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @file phtml编译任务
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 const gulp = require("gulp");

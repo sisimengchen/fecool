@@ -1,5 +1,7 @@
 /**
- * 获取Babel的配置
+ * @file babel配置生成器
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
  */
 const getOptions = require("./getOptions");
 
@@ -13,11 +15,12 @@ module.exports = function(
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   const babelOptions = {
     sourceType: "module",
-    compact: getOptions().isDevelopENV() ? "auto" : true,
+    // retainLines: getOptions().isDevelopENV() ? true : false,
+    compact: getOptions().isDevelopENV() ? false : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
     presets: [
-      [require("../babel-preset-fecool")],
+      [require("../babel-preset-fecool")], // 最后收集依赖
       isES6Enabled && [
         require("@babel/preset-env").default,
         {
@@ -25,11 +28,10 @@ module.exports = function(
           // useBuiltIns: "entry",
           useBuiltIns: false,
           targets: { browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"] },
-          modules: false
+          modules: "amd"
           // debug: true
         }
       ],
-      [require("../babel-preset-amd")],
       isReactEnabled && [
         require("@babel/preset-react").default,
         {
@@ -39,7 +41,7 @@ module.exports = function(
       ]
     ].filter(Boolean),
     plugins: [
-      [require("../babel-plugin-tinytool")],
+      [require("../babel-plugin-transform-tinytool")], // 最先执行tinytool代码的转换
       isES6Enabled && [
         require("@babel/plugin-proposal-decorators").default,
         { legacy: true }
@@ -59,6 +61,5 @@ module.exports = function(
       ]
     ].filter(Boolean)
   };
-  // debugger;
   return babelOptions;
 };

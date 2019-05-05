@@ -10,7 +10,7 @@ var t = types;
 module.exports = declare(function (api) {
   api.assertVersion(7);
   return {
-    name: "transform-modules-remove-strict",
+    name: "transform-remove-strict",
     visitor: {
       Directive: function Directive(path, _ref) {
         var opts = _ref.opts;

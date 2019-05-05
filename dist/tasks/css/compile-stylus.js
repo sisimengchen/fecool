@@ -2,9 +2,11 @@
 
 /**
  * @file stylus编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
+var nodePath = require("path");
+
 var gulp = require("gulp");
 
 var stylus = require("gulp-stylus");
@@ -63,8 +65,8 @@ function stylusCompile() {
     if (path.extname == ".css") {
       var _module2 = globalOptions.getModule(extname(file.path, ".styl"));
 
-      var hashCode = _module2.hashCode;
-      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+      var distFilename = _module2.distFilename;
+      path.basename = nodePath.basename(distFilename, ".css");
     }
   })).pipe(gulp.dest(globalOptions.getGulpDest()));
 }

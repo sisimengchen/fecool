@@ -1,3 +1,8 @@
+/**
+ * @file 配置生成器
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const path = require("path");
 const resolve = require("resolve");
 const hasha = require("hasha");
@@ -244,10 +249,12 @@ class Options {
   }
 
   /**
-   * 根据文件名获取模块信息
-   * @param {*} filename
+   * [根据文件名获取模块信息]
+   * @param  {[String]} filename   [文件名]
+   * @param  {[String]} supplyExt  [强制后缀名]
+   * @return {[String]}            [模块信息]
    */
-  getModule(filename) {
+  getModule(filename, supplyExt) {
     if (!filename) return undefined;
     if (isURL(filename)) {
       return {
@@ -255,11 +262,10 @@ class Options {
         url: filename
       };
     }
-    // console.log(filename)
     let hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
     let timestamp = this.timestamp;
-    // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
     const ext = path.extname(filename);
+    // 先把这些的hash干掉，这里以后需要做规划
     if (
       [
         ".less",
@@ -276,34 +282,62 @@ class Options {
       hashCode = "";
       timestamp = "";
     }
-    let transformFilename = this.getTransformFilename(filename, hashCode);
-    const module = {
+    let transformFilename = this.getTransformFilename(
       filename,
       hashCode,
-      transformFilename,
-      distFilename: this.mapEntry2Output(transformFilename),
-      url: this.getURL(transformFilename, timestamp)
+      supplyExt
+    );
+    const module = {
+      filename, // 源文件名
+      hashCode, // 源文件名hashcode
+      transformFilename, // 转换文件名（基础路径还是在源文件路径下，不会真实落入文件系统）
+      distFilename: this.mapEntry2Output(transformFilename), // 目标文件名
+      distFilenameRaw: this.mapEntry2Output(
+        this.getTransformFilename(filename, hashCode)
+      ), // 目标文件名不会被supplyExt影响
+      url: this.getURL(transformFilename, timestamp) // 资源url
     };
     printer.debug("模块解析", filename, "==>", module);
     return module;
   }
 
-  getTransformFilename(filename, hashCode) {
+  /**
+   * [获取转换后的文件名]
+   * @param  {[String]} filename   [文件名]
+   * @param  {[String]} hashCode   [hashcode]
+   * @param  {[String]} supplyExt  [强制后缀名]
+   * @return {[String]}            [规范后的依赖值]
+   */
+  getTransformFilename(filename, hashCode, supplyExt) {
     if (!filename) return undefined;
-    let ext = path.extname(filename);
-    if (ext === ".jsx") {
-      ext = ".js";
-    } else if (ext === ".less" || ext === ".styl") {
-      ext = ".css";
-    }
-    if (hashCode) {
-      filename = extname(filename, `.${hashCode}${ext}`);
+    if (supplyExt) {
+      if (hashCode) {
+        filename = `${filename}.${hashCode}${supplyExt}`;
+      } else {
+        filename = `${filename}${supplyExt}`;
+      }
     } else {
-      filename = extname(filename, ext);
+      let ext = path.extname(filename);
+      if (ext === ".jsx") {
+        // .jsx ==> .jsx.js
+        ext = `${ext}.js`;
+      } else if (ext === ".less" || ext === ".styl") {
+        // .less|.styl ==> .less|.styl.css
+        ext = `${ext}.css`;
+      }
+      if (hashCode) {
+        filename = extname(filename, `.${hashCode}${ext}`);
+      } else {
+        filename = extname(filename, ext);
+      }
     }
     return filename;
   }
 
+  /**
+   * 获取文件hashcode
+   * @param {*} filename
+   */
   getHashaCode(filename) {
     if (!filename) return;
     if (!this.hasha) return "";
@@ -357,8 +391,9 @@ class Options {
             middleware = require(`../middlewares/${middleware}`)(options);
           } catch (error) {
             printer.error(error);
-            middleware = false
-          } finally {}
+            middleware = false;
+          } finally {
+          }
         } else if (
           Object.prototype.toString.call(middleware) == "[object Function]"
         ) {

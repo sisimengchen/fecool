@@ -2,7 +2,7 @@
 
 /**
  * @file css编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 var gulp = require("gulp");

@@ -2,9 +2,11 @@
 
 /**
  * @file less编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
+var nodePath = require("path");
+
 var gulp = require("gulp");
 
 var gulpif = require("gulp-if");
@@ -50,8 +52,8 @@ function lessCompile() {
     if (path.extname == ".css") {
       var _module = globalOptions.getModule(extname(file.path, ".less"));
 
-      var hashCode = _module.hashCode;
-      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+      var distFilename = _module.distFilename;
+      path.basename = nodePath.basename(distFilename, ".css");
     }
   })).pipe(gulp.dest(globalOptions.getGulpDest()));
 }

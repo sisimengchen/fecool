@@ -1,7 +1,9 @@
 "use strict";
 
 /**
- * 获取Babel的配置
+ * @file babel配置生成器
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
  */
 var getOptions = require("./getOptions");
 
@@ -15,23 +17,26 @@ module.exports = function () {
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   var babelOptions = {
     sourceType: "module",
-    compact: getOptions().isDevelopENV() ? "auto" : true,
+    // retainLines: getOptions().isDevelopENV() ? true : false,
+    compact: getOptions().isDevelopENV() ? false : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
-    presets: [[require("../babel-preset-fecool")], isES6Enabled && [require("@babel/preset-env").default, {
+    presets: [[require("../babel-preset-fecool")], // 最后收集依赖
+    isES6Enabled && [require("@babel/preset-env").default, {
       ignoreBrowserslistConfig: true,
       // useBuiltIns: "entry",
       useBuiltIns: false,
       targets: {
         browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"]
       },
-      modules: false // debug: true
+      modules: "amd" // debug: true
 
-    }], [require("../babel-preset-amd")], isReactEnabled && [require("@babel/preset-react").default, {
+    }], isReactEnabled && [require("@babel/preset-react").default, {
       development: false,
       useBuiltIns: true
     }]].filter(Boolean),
-    plugins: [[require("../babel-plugin-tinytool")], isES6Enabled && [require("@babel/plugin-proposal-decorators").default, {
+    plugins: [[require("../babel-plugin-transform-tinytool")], // 最先执行tinytool代码的转换
+    isES6Enabled && [require("@babel/plugin-proposal-decorators").default, {
       legacy: true
     }], isES6Enabled && [require("@babel/plugin-proposal-class-properties").default, {
       legacy: true
@@ -41,7 +46,6 @@ module.exports = function () {
       // regenerator: true
 
     }]].filter(Boolean)
-  }; // debugger;
-
+  };
   return babelOptions;
 };

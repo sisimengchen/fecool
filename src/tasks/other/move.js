@@ -1,3 +1,8 @@
+/**
+ * @file 其他单元构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const gulp = require("gulp");
 const printer = require("../../gulp-plugin/gulp-printer");
 const changed = require("gulp-changed");

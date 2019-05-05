@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * @file 生产环境监听构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 var _require = require("gulp"),
     watch = _require.watch;
 

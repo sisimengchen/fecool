@@ -1,3 +1,8 @@
+/**
+ * @file 生产环境构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const { series, parallel } = require("gulp");
 const getPackage = require("../../package");
 const { printer } = require("../../util");

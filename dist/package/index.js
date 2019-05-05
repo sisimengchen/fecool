@@ -7,8 +7,8 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
- * @file 依赖打包工具
- * @author mengchen <mengchen002@ke.com>
+ * @file 依赖收集+打包工具
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 var Concat = require("concat-with-sourcemaps");

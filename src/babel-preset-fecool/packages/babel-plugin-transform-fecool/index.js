@@ -36,6 +36,7 @@ module.exports = declare((api, options) => {
     pre(file) {
       this.paramNameCaches = {};
       this.dependNameCaches = {};
+      this.dependCodeCaches = {};
     },
     visitor: {
       CallExpression: {
@@ -110,13 +111,15 @@ module.exports = declare((api, options) => {
                   result.transformFilename
                 );
               }
-              if (result.acitve) {
-                item.value = result.url || item.value;
-              } else {
+              if (result.code) {
                 this.paramNameCaches[paramName + ""] = true;
                 this.dependNameCaches[paramName + ""] = dependName;
+                this.dependCodeCaches[paramName + ""] = result.code;
+                return false;
+              } else {
+                item.value = result.url || item.value;
+                return true;
               }
-              return result.acitve;
             });
             callback.params = callback.params.filter(item => {
               const paramName = item.name;
@@ -134,8 +137,10 @@ module.exports = declare((api, options) => {
               }
               if (result.acitve) {
                 item.value = result.url || item.value;
+                return true;
+              } else {
+                return false;
               }
-              return result.acitve;
             });
           }
           printer.debug("解析依赖结束", this.filename);
@@ -150,9 +155,9 @@ module.exports = declare((api, options) => {
           if (!this.paramNameCaches[left.name + ""]) return;
           if (right.callee.name != INTEROP_REQUIRE_DEFAULT) return;
           const dependName = this.dependNameCaches[left.name + ""];
-          const result = createCode.call(this, dependName, left.name);
-          if (result.code) {
-            path.replaceWith(result.code);
+          const dependCode = this.dependCodeCaches[left.name + ""];
+          if (dependName && dependCode) {
+            path.replaceWith(dependCode);
           }
         }
       }

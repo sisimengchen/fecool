@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * @file 开发环境构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 var _require = require("gulp"),
     series = _require.series,
     parallel = _require.parallel;

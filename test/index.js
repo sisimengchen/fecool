@@ -12,7 +12,7 @@ const ss = babel.transformFileSync(
 );
 
 // console.log(ss.code);
-fs.writeFile('./dist.js', ss.code,()=>{})
+fs.writeFile("./dist.js", ss.code, () => {});
 // const path = require("path");
 // const resolve = require("resolve");
 

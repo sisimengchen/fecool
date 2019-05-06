@@ -1,5 +1,18 @@
 # fecool changelog
 
+## 0.1.0-alpha.3
+
+### 增加connect-mock4rentfeC中间件
+### 增加phtml编译任务
+### 优化js代码构建流程
+### 优化配置
+### 新增output.hasha配置
+### 新增output.timestamp配置
+### 新增output.imagemin配置
+### 新增optimization.args配置
+### 新增optimization.retainExtname配置
+### 优化styl,less构建错误异常处理
+
 ## 0.0.19
 
 ### 增加php同步mock功能

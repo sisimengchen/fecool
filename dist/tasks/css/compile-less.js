@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file less编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var nodePath = require("path");
 
 var gulp = require("gulp");
@@ -43,8 +38,7 @@ function lessCompile() {
     extension: ".less.css"
   })).pipe(printer(function (filepath) {
     return "less\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-  .pipe(less({
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())).pipe(less({
     plugins: [resolveUrls]
   })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath

@@ -1,9 +1,5 @@
 "use strict";
 
-/**
- * 内置一些字符画
- * @param {String} name 名称
- */
 module.exports = function (name) {
   var ascii = asciiMap[name + ""];
   ascii && console.log(ascii);

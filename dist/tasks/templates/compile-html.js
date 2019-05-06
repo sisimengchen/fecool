@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file html编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var printer = require("../../gulp-plugin/gulp-printer");

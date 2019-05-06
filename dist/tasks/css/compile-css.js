@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file css编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var modifyCssUrls = require("gulp-modify-css-urls");
@@ -36,7 +31,6 @@ function cssCompile() {
     return "css\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(modifyCssUrls({
     modify: function modify(url, filename) {
-      // url字符  当前解析的文件路径
       if (isURL(url)) return url;
       if (isDataURI(url)) return url;
 
@@ -53,8 +47,7 @@ function cssCompile() {
     }
   })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
-      var _module2 = globalOptions.getModule(file.path); // 生成hashcode
-
+      var _module2 = globalOptions.getModule(file.path);
 
       var hashCode = _module2.hashCode;
       path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;

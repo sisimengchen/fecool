@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file 公共css处理任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var cached = require("gulp-cached");

@@ -28,8 +28,7 @@ module.exports = function () {
         ext = _path$parse.ext;
 
     if (ext && ext.toLocaleLowerCase() === ".php") {
-      var fileName = path.join(globalOptions.distDir, pathname); // 获取要访问的文件
-
+      var fileName = path.join(globalOptions.distDir, pathname);
       var mockFilename = path.join(fileName, "../mock.phpjson");
       fs.readFile(fileName, "utf8", function (error, data) {
         if (error) {

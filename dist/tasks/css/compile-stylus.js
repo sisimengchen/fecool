@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file stylus编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var nodePath = require("path");
 
 var gulp = require("gulp");
@@ -46,7 +41,6 @@ function stylusCompile() {
     "include css": true
   })).on("error", swallowError).pipe(modifyCssUrls({
     modify: function modify(url, filename) {
-      // url字符  当前解析的文件路径
       if (isURL(url)) return url;
       if (isDataURI(url)) return url;
 

@@ -40,14 +40,10 @@ module.exports = function () {
   options.simulatorDirName = path.isAbsolute(options.simulatorDirName) ? options.simulatorDirName : path.join(globalOptions.context, options.simulatorDirName);
   options.mainlayoutFileName = path.isAbsolute(options.mainlayoutFileName) ? options.mainlayoutFileName : path.join(globalOptions.context, options.mainlayoutFileName);
   options.mainlayoutFileName = globalOptions.mapEntry2Output(options.mainlayoutFileName);
-  var viewRendererSimulatorFileName = path.resolve(options.simulatorDirName, "./ViewRendererSimulator.php"); // ViewRenderer 模拟类php路径
-
-  var commonMockFileName = path.resolve(options.simulatorDirName, "./mock_base.json"); // 公共的mock文件
-
-  var defaultMockFileName = path.resolve(options.simulatorDirName, "./mock_default.json"); // 默认的私有mock文件
-
-  var templateFileName = path.resolve(options.simulatorDirName, "./template.php"); // 代码模板文件
-
+  var viewRendererSimulatorFileName = path.resolve(options.simulatorDirName, "./ViewRendererSimulator.php");
+  var commonMockFileName = path.resolve(options.simulatorDirName, "./mock_base.json");
+  var defaultMockFileName = path.resolve(options.simulatorDirName, "./mock_default.json");
+  var templateFileName = path.resolve(options.simulatorDirName, "./template.php");
   var phpServer = spawn("php", ["-S", "".concat(options.phpServer.host, ":").concat(options.phpServer.port), "-t", globalOptions.distDir]);
   phpServer.stdout.on("data", function (data) {
     printer.log(data.toString());
@@ -59,50 +55,39 @@ module.exports = function () {
     printer.log("close");
   });
   return function (req, res, next) {
-    var pathname = req._parsedUrl.pathname; // 获取访问的路径
-
+    var pathname = req._parsedUrl.pathname;
     var search = req._parsedUrl.search;
 
     var _path$parse = path.parse(pathname),
         ext = _path$parse.ext,
         base = _path$parse.base,
-        name = _path$parse.name; // ext => '.phtml'  base => 'xxx.phtml'
-
+        name = _path$parse.name;
 
     if (ext && ext.toLocaleLowerCase() === ".phtml") {
-      // 如果路径的扩展名是phtml则执行中间件
-      var fileName = path.join(globalOptions.distDir, pathname); // 通过url获取要访问的文件
+      var fileName = path.join(globalOptions.distDir, pathname);
 
       if (!fs.existsSync(fileName)) {
-        // 如果文件不存在则执行next()
         next();
         return;
       }
 
-      var mockFileName = path.join(fileName, "../".concat(name, ".mock.json")); // 默认的mock文件路径
-
-      var mockFileNameAlternate = path.join(fileName, "../mock.json"); // 替代的mock文件路径
+      var mockFileName = path.join(fileName, "../".concat(name, ".mock.json"));
+      var mockFileNameAlternate = path.join(fileName, "../mock.json");
 
       if (!fs.existsSync(mockFileName)) {
         if (!fs.existsSync(mockFileNameAlternate)) {
-          // 如果两层mock都不存在则使用默认mock
           mockFileName = defaultMockFileName;
         } else {
           mockFileName = mockFileNameAlternate;
         }
-      } // 最终生成的php路径
-
+      }
 
       ejs.renderFile(templateFileName, {
         commonMockFileName: commonMockFileName,
-        // 公共的mock
         mockFileName: mockFileName,
-        // 私有的的mock
         viewRendererSimulatorFileName: viewRendererSimulatorFileName,
         mainlayoutFileName: options.mainlayoutFileName,
-        // php layout 模板
-        fileName: fileName // php模板
-
+        fileName: fileName
       }, options, function (error, codes) {
         if (error) {
           printer.error(error);
@@ -110,9 +95,7 @@ module.exports = function () {
           return;
         }
 
-        var outPath = path.join(fileName, "../".concat(name).concat(+new Date(), ".php")); // 最终生成的php路径
-        // 生成代码
-
+        var outPath = path.join(fileName, "../".concat(name).concat(+new Date(), ".php"));
         fs.writeFile(outPath, codes, "utf8", function (error) {
           if (error) {
             printer.error(error);
@@ -120,10 +103,8 @@ module.exports = function () {
             return;
           }
 
-          var target = "".concat(options.phpServerUrl, "/").concat(path.relative(globalOptions.distDir, outPath)).concat(search ? search : ""); // php服务的
-
-          var proxy = new HttpProxy(); // 创建代理
-
+          var target = "".concat(options.phpServerUrl, "/").concat(path.relative(globalOptions.distDir, outPath)).concat(search ? search : "");
+          var proxy = new HttpProxy();
           proxy.on("proxyRes", function (proxyRes, req, res) {
             proxyRes.on("end", function () {
               fs.unlinkSync(outPath);

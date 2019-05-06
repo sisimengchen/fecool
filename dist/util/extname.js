@@ -1,14 +1,6 @@
 "use strict";
 
 var path = require("path");
-/**
- * 修改文件扩展名
- *
- * @param {String} str 输入字符
- * @param {String} extname 扩展名
- * @return {Boolean} 判断结果
- */
-
 
 module.exports = function (str, extname) {
   if (typeof str !== "string") {

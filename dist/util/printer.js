@@ -39,9 +39,6 @@ var formateArgs = function formateArgs() {
 };
 
 module.exports = {
-  /**
-   * log输出（白色）
-   */
   log: function log() {
     var _console;
 
@@ -55,10 +52,6 @@ module.exports = {
 
     (_console = console).log.apply(_console, _toConsumableArray(args));
   },
-
-  /**
-   * debug输出（粉色） (配置debug才会生效)
-   */
   debug: function debug() {
     var _console2;
 
@@ -73,10 +66,6 @@ module.exports = {
 
     (_console2 = console).log.apply(_console2, _toConsumableArray(args));
   },
-
-  /**
-   * warn输出（黄色）
-   */
   warn: function warn() {
     var _console3;
 
@@ -90,10 +79,6 @@ module.exports = {
 
     (_console3 = console).log.apply(_console3, _toConsumableArray(args));
   },
-
-  /**
-   * error输出（红色）
-   */
   error: function error() {
     var _console4;
 
@@ -107,10 +92,6 @@ module.exports = {
 
     (_console4 = console).error.apply(_console4, _toConsumableArray(args));
   },
-
-  /**
-   * 开始计算运行时间
-   */
   time: function time(name) {
     if (!name) return;
 
@@ -120,10 +101,6 @@ module.exports = {
 
     cache[name] = +new Date();
   },
-
-  /**
-   * 输出运行时间（蓝色）
-   */
   timeEnd: function timeEnd(name) {
     if (!name) return;
 

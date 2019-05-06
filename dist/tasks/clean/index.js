@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file 构建目录清理任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var del = require("del");
 
 var _require = require("../../config"),

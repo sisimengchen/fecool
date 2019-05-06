@@ -47,8 +47,7 @@ module.exports = declare(function (api, options, dirname) {
             if (!this.isTinytooljs) return;
             path.traverse({
               VariableDeclaration: function VariableDeclaration(path) {
-                if (!_this.isTinytooljs) return; // 这个要针对老代码做依赖收集，遍历变量定义的path，依赖收集
-
+                if (!_this.isTinytooljs) return;
                 var node = path.node,
                     parent = path.parent;
                 var _node$declarations = node.declarations,
@@ -66,10 +65,10 @@ module.exports = declare(function (api, options, dirname) {
                       var name = callee.name;
 
                       if (name === "require" || name === "__include" || name === "__includejson") {
-                        var args = init.arguments || []; // 获取require调用参数
+                        var args = init.arguments || [];
 
                         if (args.length) {
-                          var source = args[0].value; // 获取require调用第一个参数的值
+                          var source = args[0].value;
 
                           if (name === "__include") {
                             source = "".concat(source, ".tmpl");
@@ -86,11 +85,10 @@ module.exports = declare(function (api, options, dirname) {
                       var _name = callee.callee.name;
 
                       if (_name === "require" || _name === "__include" || _name === "__includejson") {
-                        var _args = init.callee.arguments || []; // 获取require调用参数
-
+                        var _args = init.callee.arguments || [];
 
                         if (_args.length) {
-                          var _source = _args[0].value; // 获取require调用第一个参数的值
+                          var _source = _args[0].value;
 
                           if (_name === "__include") {
                             _source = "".concat(_source, ".tmpl");
@@ -102,8 +100,7 @@ module.exports = declare(function (api, options, dirname) {
 
                           _this.temp.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(identifierName))], t.stringLiteral(_source)));
 
-                          _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), // 这个名字需要记录
-                          t.CallExpression(t.identifier(identifierName), []))]));
+                          _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.CallExpression(t.identifier(identifierName), []))]));
 
                           path.remove();
                         }
@@ -116,11 +113,10 @@ module.exports = declare(function (api, options, dirname) {
                     var _name2 = _callee.name;
 
                     if (_name2 === "require" || _name2 === "__include" || _name2 === "__includejson") {
-                      var _args2 = init.object.arguments || []; // 获取require调用参数
-
+                      var _args2 = init.object.arguments || [];
 
                       if (_args2.length) {
-                        var _source2 = _args2[0].value; // 获取require调用第一个参数的值
+                        var _source2 = _args2[0].value;
 
                         if (_name2 === "__include") {
                           _source2 = "".concat(_source2, ".tmpl");
@@ -132,8 +128,7 @@ module.exports = declare(function (api, options, dirname) {
 
                         _this.temp.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(_identifierName))], t.stringLiteral(_source2)));
 
-                        _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), // 这个名字需要记录
-                        t.memberExpression(t.identifier(_identifierName), t.identifier(init.property.name)))]));
+                        _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.memberExpression(t.identifier(_identifierName), t.identifier(init.property.name)))]));
 
                         path.remove();
                       }

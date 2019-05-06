@@ -18,11 +18,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/**
- * @file 配置生成器
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var path = require("path");
 
 var _resolve = require("resolve");
@@ -37,9 +32,7 @@ var _require = require("../util"),
     printer = _require.printer,
     extname = _require.extname;
 
-var Options =
-/*#__PURE__*/
-function () {
+var Options = function () {
   function Options() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -86,41 +79,21 @@ function () {
       this.args = output.args || this.__options.args || {};
       this.envCode = undefined;
     }
-    /**
-     * [判断是否开启debug]
-     * @return {[Boolean]}           [是否开启debug]
-     */
-
   }, {
     key: "isDebug",
     value: function isDebug() {
       return !!this.__options.debug;
     }
-    /**
-     * [判断是否开启监听]
-     * @return {[Boolean]}           [是否开启监听]
-     */
-
   }, {
     key: "isWatch",
     value: function isWatch() {
       return !!this.__options.watch;
     }
-    /**
-     * [判断是否开发者模式]
-     * @return {[Boolean]}           [是否开发者模式]
-     */
-
   }, {
     key: "isDevelopENV",
     value: function isDevelopENV() {
       return this.mode === "development";
     }
-    /**
-     * [判断是否是ModuleDirectory]
-     * @param {*} path
-     */
-
   }, {
     key: "isModuleDirectory",
     value: function isModuleDirectory(path) {
@@ -135,23 +108,11 @@ function () {
 
       return false;
     }
-    /**
-     * [输入路径到输入路径路径映射]
-     * @param {*} src
-     */
-
   }, {
     key: "mapEntry2Output",
     value: function mapEntry2Output(src) {
       return src.replace(this.sourceDir, this.distDir);
     }
-    /**
-     * [根据条件生成gulp的Vinyl] https://github.com/gulpjs/vinyl
-     * @param {*} includes 包括的文件后缀
-     * @param {*} excludes 不包括的文件后缀
-     * @param {*} excludeCommon 是否包含common目录
-     */
-
   }, {
     key: "getGulpSrc",
     value: function getGulpSrc() {
@@ -173,12 +134,6 @@ function () {
 
       return vfs;
     }
-    /**
-     *
-     * @param {*} includes 包括的文件后缀
-     * @param {*} excludes 不包括的文件后缀
-     */
-
   }, {
     key: "getCommonSrc",
     value: function getCommonSrc() {
@@ -195,10 +150,6 @@ function () {
 
       return vfs;
     }
-    /**
-     * 获取common目录
-     */
-
   }, {
     key: "getCommonDest",
     value: function getCommonDest() {
@@ -225,12 +176,6 @@ function () {
     value: function getGulpDest() {
       return this.distDir;
     }
-    /**
-     * [根据资源绝对路径获取编译后的url]
-     * @param  {[String]} source    [资源绝对路径]
-     * @return {[String]}           [资源编译后的url]
-     */
-
   }, {
     key: "getURL",
     value: function getURL() {
@@ -251,13 +196,6 @@ function () {
       printer.debug("获取URL", source, "==>", url);
       return url;
     }
-    /**
-     * [根据基准文件路径+资源相对路径找到资源具觉得路径]
-     * @param  {[String]} source    [资源相对路径]
-     * @param  {[String]} filename   [基准文件路径]
-     * @return {[String]}           [依赖资源具体所在的文件路径]
-     */
-
   }, {
     key: "resolve",
     value: function resolve(source, filename) {
@@ -268,10 +206,9 @@ function () {
       } else if (isDataURI(source)) {
         resourcePath = source;
       } else {
-        var normalizedPath = this.normalize(source, filename); // normalize化
+        var normalizedPath = this.normalize(source, filename);
 
         try {
-          // 利用 browserify/resolve（ https://github.com/browserify/resolve ) 进行寻路
           resourcePath = _resolve.sync(normalizedPath, {
             moduleDirectory: this.moduleDirectory,
             basedir: path.dirname(filename),
@@ -286,19 +223,10 @@ function () {
       printer.debug("路径解析", filename, source, "==>", resourcePath);
       return resourcePath;
     }
-    /**
-     * [依赖描述规范化]
-     * @param  {[String]} source    [依赖值]
-     * @param  {[String]} filename  [依赖文件的绝对路径]
-     * @return {[String]}           [规范后的依赖值]
-     */
-
   }, {
     key: "normalize",
     value: function normalize(source, filename) {
-      // 判断是否匹配到了alias规则，如果匹配了，则进行规范处理
       if (this.isAliasOn && source && isPath(source) && isRelativePath(source)) {
-        // 如果source是一个相对路径，并且开启了alias
         var pathList = source.split("/");
         if (pathList.length === 0) return source;
         var aliasKey = pathList[0];
@@ -306,20 +234,12 @@ function () {
         if (!aliasPath) return source;
         pathList.shift();
         source = path.resolve(aliasPath, "".concat(pathList.join("/")));
-        var relative = path.relative(path.dirname(filename), source); // let relative = path.relative(path.dirname(filename), source);
-
+        var relative = path.relative(path.dirname(filename), source);
         return "./".concat(relative);
       }
 
       return source;
     }
-    /**
-     * [根据文件名获取模块信息]
-     * @param  {[String]} filename   [文件名]
-     * @param  {[String]} supplyExt  [强制后缀名]
-     * @return {[String]}            [模块信息]
-     */
-
   }, {
     key: "getModule",
     value: function getModule(filename, supplyExt) {
@@ -334,7 +254,7 @@ function () {
 
       var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
       var timestamp = this.timestamp;
-      var ext = path.extname(filename); // 先把这些的hash干掉，这里以后需要做规划
+      var ext = path.extname(filename);
 
       if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
@@ -344,29 +264,15 @@ function () {
       var transformFilename = this.getTransformFilename(filename, hashCode, supplyExt);
       var module = {
         filename: filename,
-        // 源文件名
         hashCode: hashCode,
-        // 源文件名hashcode
         transformFilename: transformFilename,
-        // 转换文件名（基础路径还是在源文件路径下，不会真实落入文件系统）
         distFilename: this.mapEntry2Output(transformFilename),
-        // 目标文件名
         distFilenameRaw: this.mapEntry2Output(this.getTransformFilename(filename, hashCode)),
-        // 目标文件名不会被supplyExt影响
-        url: this.getURL(transformFilename, timestamp) // 资源url
-
+        url: this.getURL(transformFilename, timestamp)
       };
       printer.debug("模块解析", filename, "==>", module);
       return module;
     }
-    /**
-     * [获取转换后的文件名]
-     * @param  {[String]} filename   [文件名]
-     * @param  {[String]} hashCode   [hashcode]
-     * @param  {[String]} supplyExt  [强制后缀名]
-     * @return {[String]}            [规范后的依赖值]
-     */
-
   }, {
     key: "getTransformFilename",
     value: function getTransformFilename(filename, hashCode, supplyExt) {
@@ -382,10 +288,8 @@ function () {
         var ext = path.extname(filename);
 
         if (ext === ".jsx") {
-          // .jsx ==> .jsx.js
           ext = this.retainExtname ? "".concat(ext, ".js") : ".js";
         } else if (ext === ".less" || ext === ".styl") {
-          // .less|.styl ==> .less|.styl.css
           ext = this.retainExtname ? "".concat(ext, ".css") : ".css";
         }
 
@@ -398,11 +302,6 @@ function () {
 
       return filename;
     }
-    /**
-     * 获取文件hashcode
-     * @param {*} filename
-     */
-
   }, {
     key: "getHashaCode",
     value: function getHashaCode(filename) {
@@ -410,7 +309,7 @@ function () {
       if (!this.hasha) return "";
       return hasha.fromFileSync(filename, {
         algorithm: "md5"
-      }); // 生成hashcode
+      });
     }
   }, {
     key: "getEnvCode",
@@ -437,11 +336,6 @@ function () {
 
       return this.envCode;
     }
-    /**
-     * [服务配置获取]
-     * @return {[object]}           [配置对象]
-     */
-
   }, {
     key: "server",
     value: function server() {
@@ -453,7 +347,6 @@ function () {
       this.server.middleware = this.server.middleware || [];
       this.server.middleware = this.server.middleware.map(function (item, index) {
         var middleware, options;
-        console.log("serverserverserverserver", Object.prototype.toString.call(item));
 
         if (Object.prototype.toString.call(item) === "[object Array]") {
           var _item = _slicedToArray(item, 2);

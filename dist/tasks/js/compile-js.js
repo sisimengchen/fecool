@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file js编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var gulpif = require("gulp-if");
@@ -30,13 +25,11 @@ var _require2 = require("../../util"),
 var globalOptions = getOptions();
 
 function jsCompile() {
-  return gulp.src(globalOptions.getGulpSrc("js", false, true)) // 对于非common目录下的所有.js资源执行
-  .pipe(changed(globalOptions.getGulpDest(), {
+  return gulp.src(globalOptions.getGulpSrc("js", false, true)).pipe(changed(globalOptions.getGulpDest(), {
     extension: ".js"
   })).pipe(printer(function (filepath) {
     return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-  .pipe(babel(getBabelOptions())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())).pipe(babel(getBabelOptions())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file phtml编译任务
- * @author mengchen <sisimengchen@gmail.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var gulpif = require("gulp-if");
@@ -48,8 +43,7 @@ function phtmlCompile() {
     } catch (error) {} finally {
       return "'".concat(source, "'");
     }
-  })).pipe( // 如果是开发环境解析补全includeTpl的路径
-  gulpif(globalOptions.isDevelopENV(), replace(includeTplReg, function (match, p1, p2, p3, str) {
+  })).pipe(gulpif(globalOptions.isDevelopENV(), replace(includeTplReg, function (match, p1, p2, p3, str) {
     var source = p2;
 
     if (!source.endsWith(".phtml")) {

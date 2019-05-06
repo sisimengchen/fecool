@@ -21,8 +21,7 @@ module.exports = function () {
     var _path$parse = path.parse(pathname),
         ext = _path$parse.ext,
         base = _path$parse.base,
-        name = _path$parse.name; // ext => '.phtml'  base => 'xxx.phtml'
-
+        name = _path$parse.name;
 
     if (ext && ext.toLocaleLowerCase() === ".ejs") {
       var fileName = path.join(globalOptions.distDir, pathname);

@@ -62,7 +62,12 @@ const config = {
   output: {
     path: "./dist", // 导出代码根目录
     common: "./dist/common", // 导出公共代码根目录
-    publicPath: "//fecool.com:8080" // 静态资源路径前缀
+    publicPath: "//fecool.com:8080", // 静态资源路径前缀
+    hasha: false, // 是否开启文件hasha
+    timestamp: +new Date, // 指定资源构建的时间戳，为空则无
+    args: { // 构建注入参数 可通过window.__args访问这个对象，系统会额外增加上两个属性buildTimestamp（构建时间戳），env（构建环境）
+      x: 1
+    }
   },
   resolve: {
     alias: { // 资源寻路别名
@@ -71,17 +76,29 @@ const config = {
       utils: "./src/utils"
     }
   },
-  template: "php", // 项目的模板，默认ejs 目前只能针对配置的模板做mock
   server: { // browser-sync 配置 具体请参考 https://www.browsersync.io/docs/options
     port: 8080,
     single: true, // 启用单页面模式
     open: "external", // 启动浏览器 "external"
     host: "fecool.com",
     watch: false,
-    middleware: []
+    middleware: [
+      [
+        "connect-mock4rentfeC", // 4个内置中间件之一具体功能请见 src/middlewares目录
+        {
+          phpServer: {
+            host: "fecool.com",
+            port: 9527
+          },
+          simulatorDirName: "./pc/views/.development",
+          mainlayoutFileName: "./pc/views/layouts/main.phtml"
+        }
+      ]
+    ] // 中间件
   },
-  args: { // 构建注入参数 可通过window.__args访问这个对象，系统会额外增加上两个属性buildTimestamp（构建时间戳），env（构建环境）
-    x: 1
+  optimization: {
+    imagemin: false, // 启用图片压缩
+    retainExtname: true // 保留扩展名
   }
 };
 
@@ -100,7 +117,7 @@ module.exports = config;
 
 针对js文件，触发寻路的方式有:es6的import，amd的require。比如import React from "react"这段代码，会直接寻找当前代码文件外层最近的common_modules目录下的react.js或react/index.js（如果不存在则继续寻找第二近的，以此类推），并在编译后会根据output.publicPath补全成一个绝对路径的url。
 
-针对css,less,stylus,html,以及作为js代码导入的tmpl，需要对在路径后添加一个#url符号来触发编译寻路功能，比如background-image: url("./img/nodata.png#url")这段代码，会把./img/nodata.png在编译后会根据output.publicPath补全成一个绝对路径的url。
+针对css,less,stylus,html,phtml以及作为js代码导入的tmpl,json，需要对在路径后添加一个#url符号来触发编译寻路功能，比如background-image: url("./img/nodata.png#url")这段代码，会把./img/nodata.png在编译后会根据output.publicPath补全成一个绝对路径的url。
 
 编译完成后，所有支持寻路的资源都会生成一个绝对的url，这个url大体就是部署在web容器上该资源的访问url。
 
@@ -113,7 +130,7 @@ entry.common目录是一个很特殊的目录，这个目录下的.js代码不�
 
 resolve.alias是用来为资源寻路增加一个目录的别名，key代表了目录别名，value代表了对应的目录。比如当你定义了components: "./src/components", import 'components/xxx' 在路径解析的时候会去解析./src/components/xxx，会帮你省去一些多余的...
 
-##### 配置项里有args，这个args是什么？
+##### 配置项里有output.args，这个output.args是什么？
 
 args这个对象会注入到到每一个构建输出js代码包里，当加载了代码包后，可以通过window.__args访问args这个对象的值。
 在fecool构建过程中，会给args自动插入两个属性：buildTimestamp（构建时间戳），env（构建环境）用来帮助开发者获取一些构建的必要基本信息

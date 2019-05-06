@@ -39,6 +39,7 @@ function cssCompile() {
         }
       })
     )
+    .on("error", swallowError)
     .pipe(
       postcss(
         [

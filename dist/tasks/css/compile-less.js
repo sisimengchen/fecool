@@ -46,9 +46,9 @@ function lessCompile() {
   })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
   .pipe(less({
     plugins: [resolveUrls]
-  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
+  })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
-  }))).pipe(rename(function (path, file) {
+  }))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
       var _module = globalOptions.getModule(extname(file.path, ".less"));
 

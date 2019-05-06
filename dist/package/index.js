@@ -28,7 +28,7 @@ function () {
     _classCallCheck(this, Package);
 
     this.module = {};
-    this.package = {};
+    this["package"] = {};
     this.increment = 0;
     this.dependenciesMap = {};
     this.dependenciesCache = {};
@@ -77,11 +77,11 @@ function () {
         return;
       }
 
-      var pkg = this.package["" + name];
+      var pkg = this["package"]["" + name];
 
       if (!pkg) {
-        this.package["" + name] = module;
-        pkg = this.package["" + name];
+        this["package"]["" + name] = module;
+        pkg = this["package"]["" + name];
       }
 
       if (module && pkg) {
@@ -201,7 +201,7 @@ function () {
           });
           out.write(concat.content);
           out.end();
-        }).catch(function (error) {});
+        })["catch"](function (error) {});
       };
 
       for (var i = 0; i < moduleCount; i++) {

@@ -51,7 +51,7 @@ function cssCompile() {
         return url;
       }
     }
-  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
+  })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
       var _module2 = globalOptions.getModule(file.path); // 生成hashcode
 

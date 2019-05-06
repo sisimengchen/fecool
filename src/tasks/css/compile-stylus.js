@@ -29,6 +29,7 @@ function stylusCompile() {
         "include css": true
       })
     )
+    .on("error", swallowError)
     .pipe(
       modifyCssUrls({
         modify: function(url, filename) {
@@ -47,6 +48,7 @@ function stylusCompile() {
         }
       })
     )
+    .on("error", swallowError)
     .pipe(
       postcss(
         [

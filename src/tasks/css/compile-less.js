@@ -27,6 +27,7 @@ function lessCompile() {
     .pipe(printer(filepath => `less编译任务 ${filepath}`))
     .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
     .pipe(less({ plugins: [resolveUrls] }))
+    .on("error", swallowError)
     .pipe(
       postcss(
         [
@@ -44,6 +45,7 @@ function lessCompile() {
         })
       )
     )
+    .on("error", swallowError)
     .pipe(
       rename(function(path, file) {
         if (path.extname == ".css") {

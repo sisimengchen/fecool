@@ -15,7 +15,7 @@ var _require2 = require("../../util"),
 var _require3 = require("@babel/core"),
     template = _require3.template;
 
-var generate = require("@babel/generator").default;
+var generate = require("@babel/generator")["default"];
 
 var codeWrapper = template("\n  define('NAME', function() {\n    return 'VALUE';\n  })\n");
 var defaultOptions = {

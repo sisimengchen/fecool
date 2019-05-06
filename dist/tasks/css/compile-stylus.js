@@ -44,7 +44,7 @@ function stylusCompile() {
   })).pipe(stylus({
     "resolve url": true,
     "include css": true
-  })).pipe(modifyCssUrls({
+  })).on("error", swallowError).pipe(modifyCssUrls({
     modify: function modify(url, filename) {
       // url字符  当前解析的文件路径
       if (isURL(url)) return url;
@@ -61,7 +61,7 @@ function stylusCompile() {
         return url;
       }
     }
-  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
+  })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
       var _module2 = globalOptions.getModule(extname(file.path, ".styl"));
 

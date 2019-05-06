@@ -419,7 +419,7 @@ function () {
         var _require2 = require("@babel/core"),
             template = _require2.template;
 
-        var generate = require("@babel/generator").default;
+        var generate = require("@babel/generator")["default"];
 
         var codeWrapper = template("window.__args = JSON.parse('VALUE');");
 

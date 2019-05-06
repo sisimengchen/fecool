@@ -29,13 +29,11 @@ var _require2 = require("../../util"),
 var path = require("path");
 
 var globalOptions = getOptions();
-var keyword = "url";
-var urlReg = new RegExp("['\"\\(]\\s*([\\w\\_\\/\\.\\-]+\\#".concat(keyword, ")\\s*['\"\\)]"), "gi");
 
 function htmlCompile() {
   return gulp.src(globalOptions.getGulpSrc("html")).pipe(changed(globalOptions.getGulpDest())).pipe(printer(function (filepath) {
     return "html\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-  })).pipe(replace(urlReg, function (match, str) {
+  })).pipe(replace(getOptions.urlReg, function (match, str) {
     var source = str.replace(/\#[^\#]+$/, "");
 
     try {

@@ -15,19 +15,13 @@ const { isURL, isDataURI, swallowError, extname } = require("../../util");
 const path = require("path");
 const globalOptions = getOptions();
 
-const keyword = "url";
-const urlReg = new RegExp(
-  `['"\\(]\\s*([\\w\\_\\/\\.\\-]+\\#${keyword})\\s*['"\\)]`,
-  "gi"
-);
-
 function htmlCompile() {
   return gulp
     .src(globalOptions.getGulpSrc("html"))
     .pipe(changed(globalOptions.getGulpDest()))
     .pipe(printer(filepath => `html编译任务 ${filepath}`))
     .pipe(
-      replace(urlReg, function(match, str) {
+      replace(getOptions.urlReg, function(match, str) {
         let source = str.replace(/\#[^\#]+$/, "");
         try {
           const resourcePath = globalOptions.resolve(source, this.file.path);

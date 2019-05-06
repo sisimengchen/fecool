@@ -22,7 +22,7 @@ module.exports = function () {
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
     presets: [[require("../babel-preset-fecool")], // 最后收集依赖
-    isES6Enabled && [require("@babel/preset-env").default, {
+    isES6Enabled && [require("@babel/preset-env")["default"], {
       ignoreBrowserslistConfig: true,
       // useBuiltIns: "entry",
       useBuiltIns: false,
@@ -31,16 +31,16 @@ module.exports = function () {
       },
       modules: "amd" // debug: true
 
-    }], isReactEnabled && [require("@babel/preset-react").default, {
+    }], isReactEnabled && [require("@babel/preset-react")["default"], {
       development: false,
       useBuiltIns: true
     }]].filter(Boolean),
     plugins: [[require("../babel-plugin-transform-tinytool")], // 最先执行tinytool代码的转换
-    isES6Enabled && [require("@babel/plugin-proposal-decorators").default, {
+    isES6Enabled && [require("@babel/plugin-proposal-decorators")["default"], {
       legacy: true
-    }], isES6Enabled && [require("@babel/plugin-proposal-class-properties").default, {
+    }], isES6Enabled && [require("@babel/plugin-proposal-class-properties")["default"], {
       legacy: true
-    }], isES6Enabled && [require("@babel/plugin-transform-runtime").default, {
+    }], isES6Enabled && [require("@babel/plugin-transform-runtime")["default"], {
       corejs: false,
       helpers: false // polyfill: false,
       // regenerator: true

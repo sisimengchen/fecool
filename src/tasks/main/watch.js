@@ -1,3 +1,8 @@
+/**
+ * @file 生产环境监听构建任务
+ * @author mengchen <sisimengchen@gmail.com>
+ * @module package
+ */
 const { watch } = require("gulp");
 const { getOptions } = require("../../config");
 const devBuild = require("./build-dev");
@@ -8,7 +13,8 @@ const {
   lessCompile,
   jsCompile,
   jsxCompile,
-  htmlCompile
+  htmlCompile,
+  phtmlCompile
 } = require("./index.js");
 
 const globalOptions = getOptions();
@@ -21,6 +27,7 @@ function watchBuild() {
     watch(globalOptions.getGulpSrc("styl"), stylusCompile);
     watch(globalOptions.getGulpSrc("less"), lessCompile);
     watch(globalOptions.getGulpSrc("html"), htmlCompile);
+    watch(globalOptions.getGulpSrc("phtml"), phtmlCompile);
     watch(globalOptions.getGulpSrc("*", "{js,jsx,css,less,styl,html}"), move);
   });
 }

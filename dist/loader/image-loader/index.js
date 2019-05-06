@@ -18,12 +18,6 @@ var codeWrapper = template("\n  var NAME = _interopRequireDefault('VALUE')\n");
 var defaultOptions = {
   limit: 10000
 };
-/**
- * [图片依赖处理器]
- * @param  {[type]} { dependName, paramName, filename } [dependName: dep中对应的依赖名, paramName: callback中对应的参数名, filename: 当前所处理的代码绝对路径]
- * @param  {[type]} options   [当前loader配置]
- * @return {[type]}          [处理之后的返回新source]
- */
 
 module.exports = function (_ref) {
   var dependName = _ref.dependName,
@@ -41,11 +35,9 @@ module.exports = function (_ref) {
         size = _fs$lstatSync.size;
 
     if (size < options.limit) {
-      // 图片输出成base64
       source = getDataURI(resourcePath);
     } else {
-      var _module = globalOptions.getModule(resourcePath); // 生成模块对象
-
+      var _module = globalOptions.getModule(resourcePath);
 
       source = _module.url;
     }
@@ -65,7 +57,6 @@ module.exports = function (_ref) {
   }
 
   return {
-    acitve: false,
     code: code
   };
-}; // 由于图片压缩需要借助gulp来执行，因此resolve步骤可以从dist中取，需要优化
+};

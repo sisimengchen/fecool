@@ -1,6 +1,6 @@
 /**
- * @file 依赖打包工具
- * @author mengchen <mengchen002@ke.com>
+ * @file 依赖收集+打包工具
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 const Concat = require("concat-with-sourcemaps");

@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * @file 公共js合并任务
- * @author mengchen <mengchen002@ke.com>
- * @module package
- */
 var gulp = require("gulp");
 
 var concat = require("gulp-concat");

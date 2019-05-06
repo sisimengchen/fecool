@@ -12,7 +12,8 @@ var _require2 = require("./index.js"),
     jsCompile = _require2.jsCompile,
     jsxCompile = _require2.jsxCompile,
     commonjsConcat = _require2.commonjsConcat,
-    htmlCompile = _require2.htmlCompile;
+    htmlCompile = _require2.htmlCompile,
+    phtmlCompile = _require2.phtmlCompile;
 
-var devBuild = series(parallel(move), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile));
+var devBuild = series(parallel(move), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile));
 module.exports = devBuild;

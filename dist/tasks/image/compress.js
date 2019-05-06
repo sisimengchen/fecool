@@ -1,12 +1,6 @@
 "use strict";
 
-/**
- * @file 图片压缩任务
- * @author mengchen <mengchen002@ke.com>
- * @module package
- */
-var gulp = require("gulp"); // const gulpif = require("gulp-if");
-
+var gulp = require("gulp");
 
 var imagemin = require("gulp-imagemin");
 

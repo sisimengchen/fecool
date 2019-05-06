@@ -1,5 +1,13 @@
 "use strict";
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -24,9 +32,7 @@ var _require = require("../util"),
     printer = _require.printer,
     extname = _require.extname;
 
-var Options =
-/*#__PURE__*/
-function () {
+var Options = function () {
   function Options() {
     var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -42,9 +48,14 @@ function () {
       var _this = this;
 
       var _this$__options = this.__options,
-          entry = _this$__options.entry,
-          output = _this$__options.output,
-          resolve = _this$__options.resolve;
+          _this$__options$entry = _this$__options.entry,
+          entry = _this$__options$entry === void 0 ? {} : _this$__options$entry,
+          _this$__options$outpu = _this$__options.output,
+          output = _this$__options$outpu === void 0 ? {} : _this$__options$outpu,
+          _this$__options$resol = _this$__options.resolve,
+          resolve = _this$__options$resol === void 0 ? {} : _this$__options$resol,
+          _this$__options$optim = _this$__options.optimization,
+          optimization = _this$__options$optim === void 0 ? {} : _this$__options$optim;
       this.mode = options.mode ? options.mode : "production";
       this.context = path.isAbsolute(options.context) ? options.context : path.join(process.cwd(), options.context);
       this.sourceDir = path.isAbsolute(entry.path) ? entry.path : path.join(this.context, entry.path);
@@ -52,7 +63,7 @@ function () {
       this.distDir = path.isAbsolute(output.path) ? output.path : path.join(this.context, output.path);
       this.distCommonDir = path.isAbsolute(output.common) ? output.common : path.join(this.context, output.common);
       this.publicPath = output.publicPath;
-      this.sourceMapDirname = "./.sourcemaps";
+      this.sourceMapDirName = "./.sourcemaps";
       this.alias = {};
       Object.keys(resolve.alias).forEach(function (item, index) {
         _this.isAliasOn = true;
@@ -60,48 +71,29 @@ function () {
         _this.alias[item] = path.isAbsolute(alia) ? alia : path.join(_this.context, alia);
       });
       this.moduleDirectory = this.__options.moduleDirectory || [];
-      this.imagemin = this.__options.imagemin || false;
-      this.timestamp = this.__options.timestamp;
+      this.imagemin = optimization.imagemin || this.__options.imagemin || false;
+      this.retainExtname = optimization.retainExtname || this.__options.retainExtname || false;
+      this.timestamp = output.timestamp || this.__options.timestamp;
       this.buildTimestamp = this.timestamp || +new Date();
-      this.hasha = this.__options.hasha;
-      this.args = this.__options.args || {};
+      this.hasha = output.hasha || this.__options.hasha || true;
+      this.args = output.args || this.__options.args || {};
       this.envCode = undefined;
     }
-    /**
-     * [判断是否开启debug]
-     * @return {[Boolean]}           [是否开启debug]
-     */
-
   }, {
     key: "isDebug",
     value: function isDebug() {
       return !!this.__options.debug;
     }
-    /**
-     * [判断是否开启监听]
-     * @return {[Boolean]}           [是否开启监听]
-     */
-
   }, {
     key: "isWatch",
     value: function isWatch() {
       return !!this.__options.watch;
     }
-    /**
-     * [判断是否开发者模式]
-     * @return {[Boolean]}           [是否开发者模式]
-     */
-
   }, {
     key: "isDevelopENV",
     value: function isDevelopENV() {
       return this.mode === "development";
     }
-    /**
-     * [判断是否是ModuleDirectory]
-     * @param {*} path
-     */
-
   }, {
     key: "isModuleDirectory",
     value: function isModuleDirectory(path) {
@@ -116,23 +108,11 @@ function () {
 
       return false;
     }
-    /**
-     * [输入路径到输入路径路径映射]
-     * @param {*} src
-     */
-
   }, {
     key: "mapEntry2Output",
     value: function mapEntry2Output(src) {
       return src.replace(this.sourceDir, this.distDir);
     }
-    /**
-     * [根据条件生成gulp的Vinyl] https://github.com/gulpjs/vinyl
-     * @param {*} includes 包括的文件后缀
-     * @param {*} excludes 不包括的文件后缀
-     * @param {*} excludeCommon 是否包含common目录
-     */
-
   }, {
     key: "getGulpSrc",
     value: function getGulpSrc() {
@@ -154,12 +134,6 @@ function () {
 
       return vfs;
     }
-    /**
-     *
-     * @param {*} includes 包括的文件后缀
-     * @param {*} excludes 不包括的文件后缀
-     */
-
   }, {
     key: "getCommonSrc",
     value: function getCommonSrc() {
@@ -176,10 +150,6 @@ function () {
 
       return vfs;
     }
-    /**
-     * 获取common目录
-     */
-
   }, {
     key: "getCommonDest",
     value: function getCommonDest() {
@@ -206,12 +176,6 @@ function () {
     value: function getGulpDest() {
       return this.distDir;
     }
-    /**
-     * [根据资源绝对路径获取编译后的url]
-     * @param  {[String]} source    [资源绝对路径]
-     * @return {[String]}           [资源编译后的url]
-     */
-
   }, {
     key: "getURL",
     value: function getURL() {
@@ -232,13 +196,6 @@ function () {
       printer.debug("获取URL", source, "==>", url);
       return url;
     }
-    /**
-     * [根据基准文件路径+资源相对路径找到资源具觉得路径]
-     * @param  {[String]} source    [资源相对路径]
-     * @param  {[String]} filename   [基准文件路径]
-     * @return {[String]}           [依赖资源具体所在的文件路径]
-     */
-
   }, {
     key: "resolve",
     value: function resolve(source, filename) {
@@ -249,10 +206,9 @@ function () {
       } else if (isDataURI(source)) {
         resourcePath = source;
       } else {
-        var normalizedPath = this.normalize(source, filename); // normalize化
+        var normalizedPath = this.normalize(source, filename);
 
         try {
-          // 利用 browserify/resolve（ https://github.com/browserify/resolve ) 进行寻路
           resourcePath = _resolve.sync(normalizedPath, {
             moduleDirectory: this.moduleDirectory,
             basedir: path.dirname(filename),
@@ -267,19 +223,10 @@ function () {
       printer.debug("路径解析", filename, source, "==>", resourcePath);
       return resourcePath;
     }
-    /**
-     * [依赖描述规范化]
-     * @param  {[String]} source    [依赖值]
-     * @param  {[String]} filename  [依赖文件的绝对路径]
-     * @return {[String]}           [规范后的依赖值]
-     */
-
   }, {
     key: "normalize",
     value: function normalize(source, filename) {
-      // 判断是否匹配到了alias规则，如果匹配了，则进行规范处理
       if (this.isAliasOn && source && isPath(source) && isRelativePath(source)) {
-        // 如果source是一个相对路径，并且开启了alias
         var pathList = source.split("/");
         if (pathList.length === 0) return source;
         var aliasKey = pathList[0];
@@ -287,21 +234,15 @@ function () {
         if (!aliasPath) return source;
         pathList.shift();
         source = path.resolve(aliasPath, "".concat(pathList.join("/")));
-        var relative = path.relative(path.dirname(filename), source); // let relative = path.relative(path.dirname(filename), source);
-
+        var relative = path.relative(path.dirname(filename), source);
         return "./".concat(relative);
       }
 
       return source;
     }
-    /**
-     * 根据文件名获取模块信息
-     * @param {*} filename
-     */
-
   }, {
     key: "getModule",
-    value: function getModule(filename) {
+    value: function getModule(filename, supplyExt) {
       if (!filename) return undefined;
 
       if (isURL(filename)) {
@@ -309,25 +250,24 @@ function () {
           filename: filename,
           url: filename
         };
-      } // console.log(filename)
-
+      }
 
       var hashCode = this.isDevelopENV() ? "" : this.getHashaCode(filename);
-      var timestamp = this.timestamp; // hashCode = ""; // 暂时先禁用吧，这里可能还有待商榷
-
+      var timestamp = this.timestamp;
       var ext = path.extname(filename);
 
-      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php"].indexOf(ext.toLocaleLowerCase()) > -1) {
+      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"].indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
         timestamp = "";
       }
 
-      var transformFilename = this.getTransformFilename(filename, hashCode);
+      var transformFilename = this.getTransformFilename(filename, hashCode, supplyExt);
       var module = {
         filename: filename,
         hashCode: hashCode,
         transformFilename: transformFilename,
         distFilename: this.mapEntry2Output(transformFilename),
+        distFilenameRaw: this.mapEntry2Output(this.getTransformFilename(filename, hashCode)),
         url: this.getURL(transformFilename, timestamp)
       };
       printer.debug("模块解析", filename, "==>", module);
@@ -335,20 +275,29 @@ function () {
     }
   }, {
     key: "getTransformFilename",
-    value: function getTransformFilename(filename, hashCode) {
+    value: function getTransformFilename(filename, hashCode, supplyExt) {
       if (!filename) return undefined;
-      var ext = path.extname(filename);
 
-      if (ext === ".jsx") {
-        ext = ".js";
-      } else if (ext === ".less" || ext === ".styl") {
-        ext = ".css";
-      }
-
-      if (hashCode) {
-        filename = extname(filename, ".".concat(hashCode).concat(ext));
+      if (supplyExt) {
+        if (hashCode) {
+          filename = "".concat(filename, ".").concat(hashCode).concat(supplyExt);
+        } else {
+          filename = "".concat(filename).concat(supplyExt);
+        }
       } else {
-        filename = extname(filename, ext);
+        var ext = path.extname(filename);
+
+        if (ext === ".jsx") {
+          ext = this.retainExtname ? "".concat(ext, ".js") : ".js";
+        } else if (ext === ".less" || ext === ".styl") {
+          ext = this.retainExtname ? "".concat(ext, ".css") : ".css";
+        }
+
+        if (hashCode) {
+          filename = extname(filename, ".".concat(hashCode).concat(ext));
+        } else {
+          filename = extname(filename, ext);
+        }
       }
 
       return filename;
@@ -360,7 +309,7 @@ function () {
       if (!this.hasha) return "";
       return hasha.fromFileSync(filename, {
         algorithm: "md5"
-      }); // 生成hashcode
+      });
     }
   }, {
     key: "getEnvCode",
@@ -369,7 +318,7 @@ function () {
         var _require2 = require("@babel/core"),
             template = _require2.template;
 
-        var generate = require("@babel/generator").default;
+        var generate = require("@babel/generator")["default"];
 
         var codeWrapper = template("window.__args = JSON.parse('VALUE');");
 
@@ -387,23 +336,40 @@ function () {
 
       return this.envCode;
     }
-    /**
-     * [服务配置获取]
-     * @return {[object]}           [配置对象]
-     */
-
   }, {
     key: "server",
     value: function server() {
-      var _this$__options2 = this.__options,
-          server = _this$__options2.server,
-          template = _this$__options2.template;
+      var server = this.__options.server;
       this.server = Object.assign({}, server);
       this.server.server = this.server.server || {};
       this.server.server.baseDir = this.distDir;
       this.server.files = this.server.files || [path.resolve(this.distDir, "**", "*.*")];
       this.server.middleware = this.server.middleware || [];
-      this.server.middleware = [require("../middlewares/connect-logger")(), template && require("../middlewares/connect-mock4".concat(template))()].filter(Boolean).concat(this.server.middleware);
+      this.server.middleware = this.server.middleware.map(function (item, index) {
+        var middleware, options;
+
+        if (Object.prototype.toString.call(item) === "[object Array]") {
+          var _item = _slicedToArray(item, 2);
+
+          middleware = _item[0];
+          var _item$ = _item[1];
+          options = _item$ === void 0 ? {} : _item$;
+        } else {
+          middleware = item;
+        }
+
+        if (Object.prototype.toString.call(middleware) == "[object String]") {
+          try {
+            middleware = require("../middlewares/".concat(middleware))(options);
+          } catch (error) {
+            printer.error(error);
+            middleware = false;
+          } finally {}
+        }
+
+        return middleware;
+      }).filter(Boolean);
+      this.server.middleware.unshift(require("../middlewares/connect-logger")());
       return this.server;
     }
   }]);

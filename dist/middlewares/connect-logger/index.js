@@ -1,12 +1,8 @@
 "use strict";
 
-module.exports = function (options) {
+module.exports = function () {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var moment, parse, url;
-
-  if (options == null) {
-    options = {};
-  }
-
   url = require("url");
   moment = require("moment");
   options.date || (options.date = "YY.MM.DD HH:mm:ss");

@@ -6,11 +6,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/**
- * @file 依赖打包工具
- * @author mengchen <mengchen002@ke.com>
- * @module package
- */
 var Concat = require("concat-with-sourcemaps");
 
 var fs = require("fs");
@@ -21,33 +16,24 @@ var _require = require("../config"),
 var _require2 = require("../util"),
     printer = _require2.printer;
 
-var Package =
-/*#__PURE__*/
-function () {
+var Package = function () {
   function Package(options) {
     _classCallCheck(this, Package);
 
     this.module = {};
-    this.package = {};
+    this["package"] = {};
     this.increment = 0;
     this.dependenciesMap = {};
     this.dependenciesCache = {};
     this.isResovled = false;
   }
-  /**
-   * 添加模块
-   * @param {*} name 模块名
-   */
-
 
   _createClass(Package, [{
     key: "addModule",
     value: function addModule(name) {
-      // 添加模块id
       var module = this.module["" + name];
 
       if (!module) {
-        // 未缓存 => 新增
         this.module["" + name] = {
           id: this.increment,
           count: 0,
@@ -62,12 +48,6 @@ function () {
       module.count = module.count + 1;
       return module;
     }
-    /**
-     * 添加依赖
-     * @param {*} name 模块名
-     * @param {*} dependencyName 依赖模块名
-     */
-
   }, {
     key: "addDependency",
     value: function addDependency(name, dependencyName) {
@@ -77,11 +57,11 @@ function () {
         return;
       }
 
-      var pkg = this.package["" + name];
+      var pkg = this["package"]["" + name];
 
       if (!pkg) {
-        this.package["" + name] = module;
-        pkg = this.package["" + name];
+        this["package"]["" + name] = module;
+        pkg = this["package"]["" + name];
       }
 
       if (module && pkg) {
@@ -90,20 +70,13 @@ function () {
         module.dependencies.unshift(dependencyName);
       }
     }
-    /**
-     * 模块名获取所有的依赖数组
-     * @param {*} name
-     * @param {*} allDependencies 依赖容器数组
-     * @param {*} cache 去重对象
-     */
-
   }, {
     key: "getDependenciesByName",
     value: function getDependenciesByName(name) {
       var allDependencies = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
       var cache = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
       var module = this.module["" + name];
-      if (!module) return false; // 这里逻辑有点问题
+      if (!module) return false;
 
       if (!cache[name]) {
         cache["" + name] = true;
@@ -119,11 +92,6 @@ function () {
         this.getDependenciesByName(dependency, allDependencies, cache);
       }
     }
-    /**
-     * 解析所有模块的依赖 最终结果会放到this.dependenciesMap 中
-     * 存在问题：互相依赖的包的处理，后续再说
-     */
-
   }, {
     key: "resovleDependencies",
     value: function resovleDependencies() {
@@ -148,10 +116,6 @@ function () {
         this.isResovled = true;
       }
     }
-    /**
-     * 合并并生成依赖的代码
-     */
-
   }, {
     key: "concatDependencies",
     value: function concatDependencies() {
@@ -201,7 +165,7 @@ function () {
           });
           out.write(concat.content);
           out.end();
-        }).catch(function (error) {});
+        })["catch"](function (error) {});
       };
 
       for (var i = 0; i < moduleCount; i++) {

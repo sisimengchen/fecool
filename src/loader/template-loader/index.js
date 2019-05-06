@@ -4,9 +4,12 @@ const { getOptions } = require("../../config");
 const minify = require("html-minifier").minify;
 const { printer } = require("../../util");
 const { template } = require("@babel/core");
+const generate = require("@babel/generator").default;
 
 const codeWrapper = template(`
-  var NAME = _interopRequireDefault('VALUE')
+  define('NAME', function() {
+    return 'VALUE';
+  })
 `);
 
 const defaultOptions = {
@@ -22,45 +25,46 @@ const defaultOptions = {
 module.exports = function({ dependName, paramName, filename }, options = {}) {
   const globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  let code, source;
+  let module = {},
+    source;
   try {
-    const resourcePath = globalOptions.resolve(dependName, filename);
-    source = fs.readFileSync(resourcePath, "utf-8");
-    source = source.replace(getOptions.urlReg, function(match, p1) {
-      // 针对#url做寻路
-      const p2 = p1.replace(/\#[^\#]+$/, "");
-      const p3 = globalOptions.resolve(p2, resourcePath);
-      const module = globalOptions.getModule(p3); // 生成模块对象
-      return `\"${module.url}\"`;
-    });
-    if (options.minify) {
-      source = minify(source, {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true
+    if (dependName != "exports") {
+      const resourcePath = globalOptions.resolve(dependName, filename);
+      source = fs.readFileSync(resourcePath, "utf8");
+      source = source.replace(getOptions.urlReg, function(match, p1) {
+        // 针对#url做寻路
+        const p2 = p1.replace(/\#[^\#]+$/, "");
+        const p3 = globalOptions.resolve(p2, resourcePath);
+        const module = globalOptions.getModule(p3); // 生成模块对象
+        return `\"${module.url}\"`;
+      });
+      if (options.minify) {
+        source = minify(source, {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true
+        });
+      }
+      module = globalOptions.getModule(resourcePath, ".js"); // 生成模块对象
+      const ast = codeWrapper({
+        NAME: module.url || dependName,
+        VALUE: source
+      });
+      const code = generate(ast).code;
+      fs.writeFile(module.distFilename, code, "utf8", error => {
+        if (error) throw err;
       });
     }
-    // 这里需要补充处理#url的逻辑
   } catch (error) {
     printer.error(error);
   } finally {
   }
-  try {
-    if (source) {
-      code = codeWrapper({ NAME: paramName, VALUE: source });
-    }
-  } catch (error) {
-    printer.error(error);
-  }
-  return {
-    acitve: false,
-    code
-  };
+  return module;
 };

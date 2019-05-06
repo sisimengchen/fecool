@@ -1,6 +1,6 @@
 /**
  * @file jsx编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 const gulp = require("gulp");
@@ -32,7 +32,7 @@ function jsxCompile() {
     .pipe(
       gulpif(
         globalOptions.isDevelopENV(),
-        sourcemaps.write(globalOptions.sourceMapDirname, {
+        sourcemaps.write(globalOptions.sourceMapDirName, {
           sourceMappingURLPrefix: globalOptions.publicPath
         })
       )

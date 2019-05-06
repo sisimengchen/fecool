@@ -1,8 +1,5 @@
 "use strict";
 
-/**
- * 获取Babel的配置
- */
 var getOptions = require("./getOptions");
 
 module.exports = function () {
@@ -15,33 +12,28 @@ module.exports = function () {
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   var babelOptions = {
     sourceType: "module",
-    compact: getOptions().isDevelopENV() ? "auto" : true,
+    compact: getOptions().isDevelopENV() ? false : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
-    presets: [[require("../babel-preset-fecool")], isES6Enabled && [require("@babel/preset-env").default, {
+    presets: [[require("../babel-preset-fecool")], isES6Enabled && [require("@babel/preset-env")["default"], {
       ignoreBrowserslistConfig: true,
-      // useBuiltIns: "entry",
       useBuiltIns: false,
       targets: {
         browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"]
       },
-      modules: false // debug: true
-
-    }], [require("../babel-preset-amd")], isReactEnabled && [require("@babel/preset-react").default, {
+      modules: "amd"
+    }], isReactEnabled && [require("@babel/preset-react")["default"], {
       development: false,
       useBuiltIns: true
     }]].filter(Boolean),
-    plugins: [[require("../babel-plugin-tinytool")], isES6Enabled && [require("@babel/plugin-proposal-decorators").default, {
+    plugins: [[require("../babel-plugin-transform-tinytool")], isES6Enabled && [require("@babel/plugin-proposal-decorators")["default"], {
       legacy: true
-    }], isES6Enabled && [require("@babel/plugin-proposal-class-properties").default, {
+    }], isES6Enabled && [require("@babel/plugin-proposal-class-properties")["default"], {
       legacy: true
-    }], isES6Enabled && [require("@babel/plugin-transform-runtime").default, {
+    }], isES6Enabled && [require("@babel/plugin-transform-runtime")["default"], {
       corejs: false,
-      helpers: false // polyfill: false,
-      // regenerator: true
-
+      helpers: false
     }]].filter(Boolean)
-  }; // debugger;
-
+  };
   return babelOptions;
 };

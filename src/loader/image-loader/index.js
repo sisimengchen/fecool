@@ -44,7 +44,6 @@ module.exports = function({ dependName, paramName, filename }, options = {}) {
     printer.error(error);
   }
   return {
-    acitve: false,
     code
   };
 };

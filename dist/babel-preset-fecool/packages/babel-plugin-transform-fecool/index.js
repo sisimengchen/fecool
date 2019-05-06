@@ -52,10 +52,10 @@ module.exports = declare(function (api, options) {
     pre: function pre(file) {
       this.paramNameCaches = {};
       this.dependNameCaches = {};
+      this.dependCodeCaches = {};
     },
     visitor: {
       CallExpression: {
-        // 解出被顶层define所包裹的代码，导出成类似于cmd的方式
         enter: function enter(path, _ref) {
           var _this = this;
 
@@ -66,16 +66,13 @@ module.exports = declare(function (api, options) {
           var isAmd = calleeName === REQUIRE || calleeName === DEFINE;
           if (!isAmd) return;
           var args = node.arguments || [,,,];
-          var deps, callback; // 解参数
+          var deps, callback;
 
-          if (calleeName === DEFINE && args[0] && t.isStringLiteral(args[0]) // define调用，第一个参数是字符串 define('react', ...)
-          ) {
+          if (calleeName === DEFINE && args[0] && t.isStringLiteral(args[0])) {
               if (args[1] && t.isArrayExpression(args[1])) {
-                // define调用，第一个参数是字符串 第二个参数是数组 define('react', [], function() {})
                 deps = args[1];
                 callback = args[2];
               } else {
-                // define调用，第一个参数是字符串 第二个参数不是数组 define('react', function() {})
                 args[2] = args[1];
                 args[1] = t.arrayExpression();
                 deps = args[1];
@@ -83,7 +80,7 @@ module.exports = declare(function (api, options) {
               }
             } else if (calleeName === DEFINE) {
             args[2] = args[1];
-            args[1] = args[0]; // args[0] = t.stringLiteral("@fecool_temp_name"); // 生成一个临时的 moduleName后面处理会被替换掉
+            args[1] = args[0];
 
             if (args[1] && t.isArrayExpression(args[1])) {
               deps = args[1];
@@ -95,50 +92,44 @@ module.exports = declare(function (api, options) {
               callback = args[2];
             }
           } else {
-            // require
             deps = args[0] ? args[0] : undefined;
             callback = args[1] ? args[1] : undefined;
           }
 
           if (!deps || !callback) return;
-          if (!t.isArrayExpression(deps)) return; // callback可以是一个函数表达式  也可以是一个变量
-
+          if (!t.isArrayExpression(deps)) return;
           if (!t.isFunctionExpression(callback) && !t.isIdentifier(callback)) return;
           printer.debug("解析依赖开始", this.filename);
-          var module = globalOptions.getModule(this.filename); // 生成模块对象
-
+          var module = globalOptions.getModule(this.filename);
           var moduleName4Package = module.transformFilename;
-          getPackage().addModule(moduleName4Package); // 把模块添加到打包列表中
+          getPackage().addModule(moduleName4Package);
 
           if (calleeName === DEFINE) {
-            args[0] = t.stringLiteral(module.url); // 定义为一个新的模块名称
+            args[0] = t.stringLiteral(module.url);
           }
 
           if (t.isFunctionExpression(callback)) {
-            // 如果callback是一个函数表达式，则解出params
             var _callback = callback,
                 _callback$params = _callback.params,
-                params = _callback$params === void 0 ? [] : _callback$params; // 遍历依赖里的每一项
-
+                params = _callback$params === void 0 ? [] : _callback$params;
             deps.elements = deps.elements.filter(function (item, index) {
-              var dependName = item.value; // 依赖名
-
-              var paramName = params[index].name; // 参数名
-
+              var dependName = item.value;
+              var paramName = params[index].name;
               var result = createCode.call(_this, dependName, paramName);
 
               if (result.transformFilename) {
                 getPackage().addDependency(moduleName4Package, result.transformFilename);
               }
 
-              if (result.acitve) {
-                item.value = result.url || item.value;
-              } else {
+              if (result.code) {
                 _this.paramNameCaches[paramName + ""] = true;
                 _this.dependNameCaches[paramName + ""] = dependName;
+                _this.dependCodeCaches[paramName + ""] = result.code;
+                return false;
+              } else {
+                item.value = result.url || item.value;
+                return true;
               }
-
-              return result.acitve;
             });
             callback.params = callback.params.filter(function (item) {
               var paramName = item.name;
@@ -146,8 +137,7 @@ module.exports = declare(function (api, options) {
             });
           } else {
             deps.elements = deps.elements.filter(function (item, index) {
-              var dependName = item.value; // 依赖名
-
+              var dependName = item.value;
               var result = createCode.call(_this, dependName, undefined);
 
               if (result.transformFilename) {
@@ -156,9 +146,10 @@ module.exports = declare(function (api, options) {
 
               if (result.acitve) {
                 item.value = result.url || item.value;
+                return true;
+              } else {
+                return false;
               }
-
-              return result.acitve;
             });
           }
 
@@ -166,7 +157,6 @@ module.exports = declare(function (api, options) {
         }
       },
       ExpressionStatement: {
-        // 根据loader替换代码
         exit: function exit(path, _ref2) {
           var opts = _ref2.opts;
           var node = path.node,
@@ -178,10 +168,10 @@ module.exports = declare(function (api, options) {
           if (!this.paramNameCaches[left.name + ""]) return;
           if (right.callee.name != INTEROP_REQUIRE_DEFAULT) return;
           var dependName = this.dependNameCaches[left.name + ""];
-          var result = createCode.call(this, dependName, left.name);
+          var dependCode = this.dependCodeCaches[left.name + ""];
 
-          if (result.code) {
-            path.replaceWith(result.code);
+          if (dependName && dependCode) {
+            path.replaceWith(dependCode);
           }
         }
       }

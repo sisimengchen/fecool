@@ -1,8 +1,9 @@
 /**
  * @file less编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
+const nodePath = require("path");
 const gulp = require("gulp");
 const gulpif = require("gulp-if");
 const less = require("gulp-less");
@@ -22,10 +23,11 @@ const globalOptions = getOptions();
 function lessCompile() {
   return gulp
     .src(globalOptions.getGulpSrc("less"))
-    .pipe(changed(globalOptions.getGulpDest(), { extension: ".css" }))
+    .pipe(changed(globalOptions.getGulpDest(), { extension: ".less.css" }))
     .pipe(printer(filepath => `less编译任务 ${filepath}`))
     .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
     .pipe(less({ plugins: [resolveUrls] }))
+    .on("error", swallowError)
     .pipe(
       postcss(
         [
@@ -38,19 +40,18 @@ function lessCompile() {
     .pipe(
       gulpif(
         globalOptions.isDevelopENV(),
-        sourcemaps.write(globalOptions.sourceMapDirname, {
+        sourcemaps.write(globalOptions.sourceMapDirName, {
           sourceMappingURLPrefix: globalOptions.publicPath
         })
       )
     )
+    .on("error", swallowError)
     .pipe(
       rename(function(path, file) {
         if (path.extname == ".css") {
           const module = globalOptions.getModule(extname(file.path, ".less"));
-          const hashCode = module.hashCode;
-          path.basename = hashCode
-            ? `${path.basename}.${hashCode}`
-            : path.basename;
+          const { distFilename } = module;
+          path.basename = nodePath.basename(distFilename, ".css");
         }
       })
     )

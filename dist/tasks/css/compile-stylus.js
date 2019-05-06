@@ -1,10 +1,7 @@
 "use strict";
 
-/**
- * @file stylus编译任务
- * @author mengchen <mengchen002@ke.com>
- * @module package
- */
+var nodePath = require("path");
+
 var gulp = require("gulp");
 
 var stylus = require("gulp-stylus");
@@ -36,15 +33,14 @@ var globalOptions = getOptions();
 
 function stylusCompile() {
   return gulp.src(globalOptions.getGulpSrc("styl")).pipe(changed(globalOptions.getGulpDest(), {
-    extension: ".css"
+    extension: ".styl.css"
   })).pipe(printer(function (filepath) {
     return "styl\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
   })).pipe(stylus({
     "resolve url": true,
     "include css": true
-  })).pipe(modifyCssUrls({
+  })).on("error", swallowError).pipe(modifyCssUrls({
     modify: function modify(url, filename) {
-      // url字符  当前解析的文件路径
       if (isURL(url)) return url;
       if (isDataURI(url)) return url;
 
@@ -59,12 +55,12 @@ function stylusCompile() {
         return url;
       }
     }
-  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
+  })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
       var _module2 = globalOptions.getModule(extname(file.path, ".styl"));
 
-      var hashCode = _module2.hashCode;
-      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+      var distFilename = _module2.distFilename;
+      path.basename = nodePath.basename(distFilename, ".css");
     }
   })).pipe(gulp.dest(globalOptions.getGulpDest()));
 }

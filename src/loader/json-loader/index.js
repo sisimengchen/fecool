@@ -3,9 +3,12 @@ const fs = require("fs");
 const { getOptions } = require("../../config");
 const { printer } = require("../../util");
 const { template } = require("@babel/core");
+const generate = require("@babel/generator").default;
 
 const codeWrapper = template(`
-  var NAME = _interopRequireDefault(JSON.parse('VALUE'))
+  define('NAME', function() {
+    return JSON.parse('VALUE');
+  })
 `);
 
 const defaultOptions = {
@@ -21,36 +24,39 @@ const defaultOptions = {
 module.exports = function({ dependName, paramName, filename }, options) {
   const globalOptions = getOptions();
   options = Object.assign({}, defaultOptions, options);
-  let code, source;
+  let module = {},
+    source;
   try {
-    const resourcePath = globalOptions.resolve(dependName, filename);
-    source = fs.readFileSync(resourcePath, "utf-8");
-    source = source.replace(getOptions.urlReg, function(match, p1) {
-      // 针对#url做寻路
-      const p2 = p1.replace(/\#[^\#]+$/, "");
-      const p3 = globalOptions.resolve(p2, resourcePath);
-      const module = globalOptions.getModule(p3); // 生成模块对象
-      return `\"${module.url}\"`;
-    });
-    if (options.minify) {
-      source = JSON.parse(source);
-      source = JSON.stringify(source)
-        .replace(/\u2028/g, "\\u2028")
-        .replace(/\u2029/g, "\\u2029");
+    if (dependName != "exports") {
+      const resourcePath = globalOptions.resolve(dependName, filename);
+      source = fs.readFileSync(resourcePath, "utf8");
+      source = source.replace(getOptions.urlReg, function(match, p1) {
+        // 针对#url做寻路
+        const p2 = p1.replace(/\#[^\#]+$/, "");
+        const p3 = globalOptions.resolve(p2, resourcePath);
+        const module = globalOptions.getModule(p3); // 生成模块对象
+        return `\"${module.url}\"`;
+      });
+      if (options.minify) {
+        source = JSON.parse(source);
+        source = JSON.stringify(source)
+          .replace(/\u2028/g, "\\u2028")
+          .replace(/\u2029/g, "\\u2029");
+      }
+      module = globalOptions.getModule(resourcePath, ".js"); // 生成模块对象
+      const ast = codeWrapper({
+        NAME: module.url || dependName,
+        VALUE: source,
+        JSON: "JSON"
+      });
+      const code = generate(ast).code;
+      fs.writeFile(module.distFilename, code, "utf8", error => {
+        if (error) throw err;
+      });
     }
   } catch (error) {
     printer.error(error);
   } finally {
   }
-  try {
-    if (source) {
-      code = codeWrapper({ NAME: paramName, VALUE: source, JSON: "JSON" });
-    }
-  } catch (error) {
-    printer.error(error);
-  }
-  return {
-    acitve: false,
-    code
-  };
+  return module;
 };

@@ -1,6 +1,6 @@
 /**
  * @file js编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 const gulp = require("gulp");
@@ -23,46 +23,11 @@ function jsCompile() {
       .pipe(printer(filepath => `js编译任务 ${filepath}`))
       .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
       .pipe(babel(getBabelOptions()))
-      // .pipe(
-      //   gulpif(
-      //     file => {
-      //       const { path, contents } = file;
-      //       return !contents
-      //         .toString("utf8", 0, 18)
-      //         .startsWith("/* @thirdmodule */");
-      //     },
-      //     babel(
-      //       getBabelOptions({
-      //         isModule: false,
-      //         isES6Enabled: true,
-      //         isReactEnabled: false
-      //       })
-      //     )
-      //   )
-      // )
-      // .on("error", swallowError)
-      // .pipe(
-      //   gulpif(
-      //     file => {
-      //       const { path, contents } = file;
-      //       return contents
-      //         .toString("utf8", 0, 18)
-      //         .startsWith("/* @thirdmodule */");
-      //     },
-      //     babel(
-      //       getBabelOptions({
-      //         isModule: true,
-      //         isES6Enabled: true,
-      //         isReactEnabled: false
-      //       })
-      //     )
-      //   )
-      // )
       .on("error", swallowError)
       .pipe(
         gulpif(
           globalOptions.isDevelopENV(),
-          sourcemaps.write(globalOptions.sourceMapDirname, {
+          sourcemaps.write(globalOptions.sourceMapDirName, {
             sourceMappingURLPrefix: globalOptions.publicPath
           })
         )

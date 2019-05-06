@@ -1,9 +1,10 @@
 /**
- * @file html编译任务
+ * @file phtml编译任务
  * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
 const gulp = require("gulp");
+const gulpif = require("gulp-if");
 const printer = require("../../gulp-plugin/gulp-printer");
 const changed = require("gulp-changed");
 const replace = require("gulp-replace");
@@ -15,11 +16,13 @@ const { isURL, isDataURI, swallowError, extname } = require("../../util");
 const path = require("path");
 const globalOptions = getOptions();
 
-function htmlCompile() {
+const includeTplReg = /(\$this\s*->\s*includeTpl\s*\(['"])(\S*)(['"])/gi;
+
+function phtmlCompile() {
   return gulp
-    .src(globalOptions.getGulpSrc("html"))
+    .src(globalOptions.getGulpSrc("phtml"))
     .pipe(changed(globalOptions.getGulpDest()))
-    .pipe(printer(filepath => `html编译任务 ${filepath}`))
+    .pipe(printer(filepath => `phtml编译任务 ${filepath}`))
     .pipe(
       replace(getOptions.urlReg, function(match, str) {
         let source = str.replace(/\#[^\#]+$/, "");
@@ -33,15 +36,28 @@ function htmlCompile() {
         }
       })
     )
-    .pipe(inlinesource())
     .pipe(
-      template({
-        publicPath: globalOptions.publicPath,
-        envCode: globalOptions.getEnvCode()
-      })
+      // 如果是开发环境解析补全includeTpl的路径
+      gulpif(
+        globalOptions.isDevelopENV(),
+        replace(includeTplReg, function(match, p1, p2, p3, str) {
+          let source = p2;
+          if (!source.endsWith(".phtml")) {
+            source = `${source}.phtml`;
+          }
+          try {
+            const resourcePath = globalOptions.resolve(source, this.file.path);
+            source = resourcePath;
+          } catch (error) {
+          } finally {
+            return `${p1}${source}${p3}`;
+          }
+        })
+      )
     )
+    .pipe(inlinesource())
     .on("error", swallowError)
     .pipe(gulp.dest(globalOptions.getGulpDest()));
 }
 
-module.exports = htmlCompile;
+module.exports = phtmlCompile;

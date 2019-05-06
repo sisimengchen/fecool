@@ -1,8 +1,9 @@
 /**
  * @file stylus编译任务
- * @author mengchen <mengchen002@ke.com>
+ * @author mengchen <sisimengchen@gmail.com>
  * @module package
  */
+const nodePath = require("path");
 const gulp = require("gulp");
 const stylus = require("gulp-stylus");
 const modifyCssUrls = require("gulp-modify-css-urls");
@@ -20,7 +21,7 @@ const globalOptions = getOptions();
 function stylusCompile() {
   return gulp
     .src(globalOptions.getGulpSrc("styl"))
-    .pipe(changed(globalOptions.getGulpDest(), { extension: ".css" }))
+    .pipe(changed(globalOptions.getGulpDest(), { extension: ".styl.css" }))
     .pipe(printer(filepath => `styl编译任务 ${filepath}`))
     .pipe(
       stylus({
@@ -28,6 +29,7 @@ function stylusCompile() {
         "include css": true
       })
     )
+    .on("error", swallowError)
     .pipe(
       modifyCssUrls({
         modify: function(url, filename) {
@@ -46,6 +48,7 @@ function stylusCompile() {
         }
       })
     )
+    .on("error", swallowError)
     .pipe(
       postcss(
         [
@@ -59,10 +62,8 @@ function stylusCompile() {
       rename(function(path, file) {
         if (path.extname == ".css") {
           const module = globalOptions.getModule(extname(file.path, ".styl"));
-          const hashCode = module.hashCode;
-          path.basename = hashCode
-            ? `${path.basename}.${hashCode}`
-            : path.basename;
+          const { distFilename } = module;
+          path.basename = nodePath.basename(distFilename, ".css");
         }
       })
     )

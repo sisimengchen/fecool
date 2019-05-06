@@ -1,10 +1,7 @@
 "use strict";
 
-/**
- * @file less编译任务
- * @author mengchen <mengchen002@ke.com>
- * @module package
- */
+var nodePath = require("path");
+
 var gulp = require("gulp");
 
 var gulpif = require("gulp-if");
@@ -38,20 +35,19 @@ var globalOptions = getOptions();
 
 function lessCompile() {
   return gulp.src(globalOptions.getGulpSrc("less")).pipe(changed(globalOptions.getGulpDest(), {
-    extension: ".css"
+    extension: ".less.css"
   })).pipe(printer(function (filepath) {
     return "less\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-  .pipe(less({
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())).pipe(less({
     plugins: [resolveUrls]
-  })).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirname, {
+  })).on("error", swallowError).pipe(postcss([postcssPresetEnv(), globalOptions.isDevelopENV() ? undefined : cssnano()].filter(Boolean))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
-  }))).pipe(rename(function (path, file) {
+  }))).on("error", swallowError).pipe(rename(function (path, file) {
     if (path.extname == ".css") {
       var _module = globalOptions.getModule(extname(file.path, ".less"));
 
-      var hashCode = _module.hashCode;
-      path.basename = hashCode ? "".concat(path.basename, ".").concat(hashCode) : path.basename;
+      var distFilename = _module.distFilename;
+      path.basename = nodePath.basename(distFilename, ".css");
     }
   })).pipe(gulp.dest(globalOptions.getGulpDest()));
 }

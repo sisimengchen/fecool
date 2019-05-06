@@ -15,7 +15,8 @@ var _require3 = require("./index.js"),
     lessCompile = _require3.lessCompile,
     jsCompile = _require3.jsCompile,
     jsxCompile = _require3.jsxCompile,
-    htmlCompile = _require3.htmlCompile;
+    htmlCompile = _require3.htmlCompile,
+    phtmlCompile = _require3.phtmlCompile;
 
 var globalOptions = getOptions();
 
@@ -27,6 +28,7 @@ function watchBuild() {
     watch(globalOptions.getGulpSrc("styl"), stylusCompile);
     watch(globalOptions.getGulpSrc("less"), lessCompile);
     watch(globalOptions.getGulpSrc("html"), htmlCompile);
+    watch(globalOptions.getGulpSrc("phtml"), phtmlCompile);
     watch(globalOptions.getGulpSrc("*", "{js,jsx,css,less,styl,html}"), move);
   });
 }

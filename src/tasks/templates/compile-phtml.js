@@ -37,23 +37,19 @@ function phtmlCompile() {
       })
     )
     .pipe(
-      // 如果是开发环境解析补全includeTpl的路径
-      gulpif(
-        globalOptions.isDevelopENV(),
-        replace(includeTplReg, function(match, p1, p2, p3, str) {
-          let source = p2;
-          if (!source.endsWith(".phtml")) {
-            source = `${source}.phtml`;
-          }
-          try {
-            const resourcePath = globalOptions.resolve(source, this.file.path);
-            source = resourcePath;
-          } catch (error) {
-          } finally {
-            return `${p1}${source}${p3}`;
-          }
-        })
-      )
+      replace(includeTplReg, function(match, p1, p2, p3, str) {
+        let source = p2;
+        if (!source.endsWith(".phtml")) {
+          source = `${source}.phtml`;
+        }
+        try {
+          const resourcePath = globalOptions.resolve(source, this.file.path);
+          source = resourcePath;
+        } catch (error) {
+        } finally {
+          return `${p1}${source}${p3}`;
+        }
+      })
     )
     .pipe(inlinesource())
     .on("error", swallowError)

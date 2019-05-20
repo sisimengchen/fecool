@@ -9,6 +9,7 @@ const { printer } = require("../../util");
 const {
   clean,
   move,
+  moveExclude,
   cssCompile,
   stylusCompile,
   lessCompile,
@@ -22,7 +23,7 @@ const {
 
 const build = series(
   parallel(clean),
-  parallel(move),
+  parallel(move, moveExclude),
   parallel(cssCompile, stylusCompile, lessCompile),
   parallel(jsCompile, jsxCompile, commonjsConcat),
   parallel(htmlCompile, phtmlCompile),

@@ -6,6 +6,7 @@
 const { series, parallel } = require("gulp");
 const {
   move,
+  moveExclude,
   cssCompile,
   stylusCompile,
   lessCompile,
@@ -17,7 +18,7 @@ const {
 } = require("./index.js");
 
 const devBuild = series(
-  parallel(move),
+  parallel(move, moveExclude),
   parallel(cssCompile, stylusCompile, lessCompile),
   parallel(jsCompile, jsxCompile, commonjsConcat),
   parallel(htmlCompile, phtmlCompile)

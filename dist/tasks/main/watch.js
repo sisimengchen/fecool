@@ -29,7 +29,7 @@ function watchBuild() {
     watch(globalOptions.getGulpSrc("less"), lessCompile);
     watch(globalOptions.getGulpSrc("html"), htmlCompile);
     watch(globalOptions.getGulpSrc("phtml"), phtmlCompile);
-    watch(globalOptions.getGulpSrc("*", "{js,jsx,css,less,styl,html}"), move);
+    watch(globalOptions.getGulpSrc("*", globalOptions.getIgnoreMove()), move);
   });
 }
 

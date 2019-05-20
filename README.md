@@ -57,7 +57,8 @@ const config = {
   context: process.cwd(), // 当前编译上下文，建议直接采用这个
   entry: {
     path: "./src", // 源码根目录
-    common: "./src/common" // 公共源码目录
+    common: "./src/common", // 公共源码目录
+    exclude: ["./src/third"] // 不被编译的资源，可以为目录，也可以为文件
   },
   output: {
     path: "./dist", // 导出代码根目录
@@ -68,7 +69,8 @@ const config = {
     args: {
       // 构建注入参数 可通过window.__args访问这个对象，系统会额外增加上两个属性buildTimestamp（构建时间戳），env（构建环境）
       x: 1
-    }
+    },
+    ignoreExt: ['.md'] // 忽略输出的资源扩展名，一些非代码资源是否需要被移动到编译目录，可以通过这个增加扩展名控制
   },
   resolve: {
     alias: {

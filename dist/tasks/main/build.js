@@ -12,6 +12,7 @@ var _require2 = require("../../util"),
 var _require3 = require("./index.js"),
     clean = _require3.clean,
     move = _require3.move,
+    moveExclude = _require3.moveExclude,
     cssCompile = _require3.cssCompile,
     stylusCompile = _require3.stylusCompile,
     lessCompile = _require3.lessCompile,
@@ -22,7 +23,7 @@ var _require3 = require("./index.js"),
     phtmlCompile = _require3.phtmlCompile,
     imageCompress = _require3.imageCompress;
 
-var build = series(parallel(clean), parallel(move), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile), parallel(imageCompress), function (cb) {
+var build = series(parallel(clean), parallel(move, moveExclude), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile), parallel(imageCompress), function (cb) {
   printer.log("编译任务执行完毕");
   printer.timeEnd("编译任务执行时间");
   printer.time("打包任务执行时间");

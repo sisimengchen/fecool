@@ -10,10 +10,23 @@ const {
   isURL,
   isDataURI,
   isPath,
+  isDirectory,
   isRelativePath,
   printer,
   extname
 } = require("../util");
+
+const codeExt = [
+  ".less",
+  ".css",
+  ".styl",
+  ".js",
+  ".jsx",
+  ".html",
+  ".ejs",
+  ".php",
+  ".phtml"
+];
 
 class Options {
   constructor(options = {}) {
@@ -38,6 +51,11 @@ class Options {
     this.commonDir = path.isAbsolute(entry.common)
       ? entry.common
       : path.join(this.context, entry.common);
+    this.exclude = (entry.exclude || []).map((excludePath, index) => {
+      return path.isAbsolute(excludePath)
+        ? excludePath
+        : path.join(this.context, excludePath);
+    });
     this.distDir = path.isAbsolute(output.path)
       ? output.path
       : path.join(this.context, output.path);
@@ -62,7 +80,19 @@ class Options {
     this.buildTimestamp = this.timestamp || +new Date();
     this.hasha = output.hasha || this.__options.hasha || true;
     this.args = output.args || this.__options.args || {};
+    this.ignoreExt = output.ignoreExt || [];
     this.envCode = undefined;
+  }
+
+  getIgnoreMove() {
+    let list1 = codeExt.map(item => {
+      return item.slice(1);
+    });
+    let list2 = this.ignoreExt.map(item => {
+      return item.slice(1);
+    });
+    const list = list1.concat(list2);
+    return `{${list.join(",")}}`;
   }
 
   /**
@@ -125,6 +155,14 @@ class Options {
       excludes = path.resolve(this.sourceDir, "**", `*.${excludes}`);
       vfs.push(`!${excludes}`);
     }
+    if (this.exclude.length) {
+      this.exclude.forEach(excludePath => {
+        if (isDirectory(excludePath)) {
+          excludePath = path.resolve(excludePath, "**", `*.*`);
+        }
+        vfs.push(`!${excludePath}`);
+      });
+    }
     if (excludeCommon) {
       excludeCommon = path.resolve(this.commonDir, "**", `*.${includes}`);
       vfs.push(`!${excludeCommon}`);
@@ -141,9 +179,40 @@ class Options {
     const vfs = [];
     includes = path.resolve(this.commonDir, "**", `*.${includes}`);
     vfs.push(includes);
-    if (excludes) {
-      excludes = path.resolve(this.commonDir, "**", `*.${excludes}`);
-      vfs.push(`!${excludes}`);
+    this.exclude.forEach(excludePath => {
+      if (isDirectory(excludePath)) {
+        excludePath = path.resolve(excludePath, "**", `*.*`);
+      }
+      vfs.push(`!${excludePath}`);
+    });
+    if (this.exclude.length) {
+      this.exclude.forEach(excludePath => {
+        excludePath = path.resolve(excludePath, "**", `*.*`);
+        vfs.push(`!${excludePath}`);
+      });
+    }
+    return vfs;
+  }
+
+  getExcludeSrc() {
+    const vfs = [];
+    if (this.exclude.length) {
+      this.exclude.forEach(excludePath => {
+        if (isDirectory(excludePath)) {
+          excludePath = path.resolve(excludePath, "**", `*.*`);
+        }
+        vfs.push(excludePath);
+      });
+    }
+    return vfs;
+  }
+
+  getExcludeDest() {
+    const vfs = [];
+    if (this.exclude.length) {
+      this.exclude.forEach(excludePath => {
+        vfs.push(this.mapEntry2Output(excludePath));
+      });
     }
     return vfs;
   }
@@ -273,19 +342,7 @@ class Options {
     let timestamp = this.timestamp;
     const ext = path.extname(filename);
     // 先把这些的hash干掉，这里以后需要做规划
-    if (
-      [
-        ".less",
-        ".css",
-        ".styl",
-        ".js",
-        ".jsx",
-        ".html",
-        ".ejs",
-        ".php",
-        ".phtml"
-      ].indexOf(ext.toLocaleLowerCase()) > -1
-    ) {
+    if (codeExt.indexOf(ext.toLocaleLowerCase()) > -1) {
       hashCode = "";
       timestamp = "";
     }

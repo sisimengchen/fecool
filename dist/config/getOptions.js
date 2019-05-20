@@ -28,9 +28,12 @@ var _require = require("../util"),
     isURL = _require.isURL,
     isDataURI = _require.isDataURI,
     isPath = _require.isPath,
+    isDirectory = _require.isDirectory,
     isRelativePath = _require.isRelativePath,
     printer = _require.printer,
     extname = _require.extname;
+
+var codeExt = [".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"];
 
 var Options = function () {
   function Options() {
@@ -60,6 +63,9 @@ var Options = function () {
       this.context = path.isAbsolute(options.context) ? options.context : path.join(process.cwd(), options.context);
       this.sourceDir = path.isAbsolute(entry.path) ? entry.path : path.join(this.context, entry.path);
       this.commonDir = path.isAbsolute(entry.common) ? entry.common : path.join(this.context, entry.common);
+      this.exclude = (entry.exclude || []).map(function (excludePath, index) {
+        return path.isAbsolute(excludePath) ? excludePath : path.join(_this.context, excludePath);
+      });
       this.distDir = path.isAbsolute(output.path) ? output.path : path.join(this.context, output.path);
       this.distCommonDir = path.isAbsolute(output.common) ? output.common : path.join(this.context, output.common);
       this.publicPath = output.publicPath;
@@ -77,7 +83,20 @@ var Options = function () {
       this.buildTimestamp = this.timestamp || +new Date();
       this.hasha = output.hasha || this.__options.hasha || true;
       this.args = output.args || this.__options.args || {};
+      this.ignoreExt = output.ignoreExt || [];
       this.envCode = undefined;
+    }
+  }, {
+    key: "getIgnoreMove",
+    value: function getIgnoreMove() {
+      var list1 = codeExt.map(function (item) {
+        return item.slice(1);
+      });
+      var list2 = this.ignoreExt.map(function (item) {
+        return item.slice(1);
+      });
+      var list = list1.concat(list2);
+      return "{".concat(list.join(","), "}");
     }
   }, {
     key: "isDebug",
@@ -127,6 +146,16 @@ var Options = function () {
         vfs.push("!".concat(excludes));
       }
 
+      if (this.exclude.length) {
+        this.exclude.forEach(function (excludePath) {
+          if (isDirectory(excludePath)) {
+            excludePath = path.resolve(excludePath, "**", "*.*");
+          }
+
+          vfs.push("!".concat(excludePath));
+        });
+      }
+
       if (excludeCommon) {
         excludeCommon = path.resolve(this.commonDir, "**", "*.".concat(includes));
         vfs.push("!".concat(excludeCommon));
@@ -142,10 +171,51 @@ var Options = function () {
       var vfs = [];
       includes = path.resolve(this.commonDir, "**", "*.".concat(includes));
       vfs.push(includes);
+      this.exclude.forEach(function (excludePath) {
+        if (isDirectory(excludePath)) {
+          excludePath = path.resolve(excludePath, "**", "*.*");
+        }
 
-      if (excludes) {
-        excludes = path.resolve(this.commonDir, "**", "*.".concat(excludes));
-        vfs.push("!".concat(excludes));
+        vfs.push("!".concat(excludePath));
+      });
+
+      if (this.exclude.length) {
+        this.exclude.forEach(function (excludePath) {
+          excludePath = path.resolve(excludePath, "**", "*.*");
+          vfs.push("!".concat(excludePath));
+        });
+      }
+
+      return vfs;
+    }
+  }, {
+    key: "getExcludeSrc",
+    value: function getExcludeSrc() {
+      var vfs = [];
+
+      if (this.exclude.length) {
+        this.exclude.forEach(function (excludePath) {
+          if (isDirectory(excludePath)) {
+            excludePath = path.resolve(excludePath, "**", "*.*");
+          }
+
+          vfs.push(excludePath);
+        });
+      }
+
+      return vfs;
+    }
+  }, {
+    key: "getExcludeDest",
+    value: function getExcludeDest() {
+      var _this2 = this;
+
+      var vfs = [];
+
+      if (this.exclude.length) {
+        this.exclude.forEach(function (excludePath) {
+          vfs.push(_this2.mapEntry2Output(excludePath));
+        });
       }
 
       return vfs;
@@ -256,7 +326,7 @@ var Options = function () {
       var timestamp = this.timestamp;
       var ext = path.extname(filename);
 
-      if ([".less", ".css", ".styl", ".js", ".jsx", ".html", ".ejs", ".php", ".phtml"].indexOf(ext.toLocaleLowerCase()) > -1) {
+      if (codeExt.indexOf(ext.toLocaleLowerCase()) > -1) {
         hashCode = "";
         timestamp = "";
       }

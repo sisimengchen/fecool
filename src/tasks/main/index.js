@@ -1,6 +1,7 @@
 module.exports = {
   clean: require("../clean/index"),
   move: require("../other/move"),
+  moveExclude: require("../other/move-exclude"),
   cssCompile: require("../css/compile-css"),
   stylusCompile: require("../css/compile-stylus"),
   lessCompile: require("../css/compile-less"),

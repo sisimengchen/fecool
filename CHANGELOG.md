@@ -1,5 +1,12 @@
 # fecool changelog
 
+## 0.1.0-alpha.7
+
+### 迭代升级
+
+- 增加 entry.exclude 配置
+- 增加 output.ignoreExt 配置
+
 ## 0.1.0-alpha.3
 
 ### 迭代升级

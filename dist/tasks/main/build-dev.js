@@ -6,6 +6,7 @@ var _require = require("gulp"),
 
 var _require2 = require("./index.js"),
     move = _require2.move,
+    moveExclude = _require2.moveExclude,
     cssCompile = _require2.cssCompile,
     stylusCompile = _require2.stylusCompile,
     lessCompile = _require2.lessCompile,
@@ -15,5 +16,5 @@ var _require2 = require("./index.js"),
     htmlCompile = _require2.htmlCompile,
     phtmlCompile = _require2.phtmlCompile;
 
-var devBuild = series(parallel(move), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile));
+var devBuild = series(parallel(move, moveExclude), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile));
 module.exports = devBuild;

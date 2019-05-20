@@ -10,7 +10,8 @@ const defaultOptions = {
   context: process.cwd(),
   entry: {
     path: "./src",
-    common: "./src/common"
+    common: "./src/common",
+    exclude: [] // 不被编译的资源，可以为目录，也可以为文件
   },
   output: {
     path: "./dest",
@@ -18,7 +19,8 @@ const defaultOptions = {
     publicPath: "//fecool.com:8080",
     hasha: true,
     timestamp: undefined, // 指定资源构建的时间戳，为空则无
-    args: {} // 构建出来的代码可以通过window.__args来获构建环境相关参数
+    args: {}, // 构建出来的代码可以通过window.__args来获构建环境相关参数
+    ignoreExt: [] // 忽略输出的资源扩展名
   },
   resolve: {
     alias: {}

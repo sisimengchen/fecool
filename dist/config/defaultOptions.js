@@ -7,7 +7,8 @@ var defaultOptions = {
   context: process.cwd(),
   entry: {
     path: "./src",
-    common: "./src/common"
+    common: "./src/common",
+    exclude: []
   },
   output: {
     path: "./dest",
@@ -15,7 +16,8 @@ var defaultOptions = {
     publicPath: "//fecool.com:8080",
     hasha: true,
     timestamp: undefined,
-    args: {}
+    args: {},
+    ignoreExt: []
   },
   resolve: {
     alias: {}

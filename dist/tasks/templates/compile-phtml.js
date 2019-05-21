@@ -43,7 +43,7 @@ function phtmlCompile() {
     } catch (error) {} finally {
       return "'".concat(source, "'");
     }
-  })).pipe(replace(includeTplReg, function (match, p1, p2, p3, str) {
+  })).pipe(gulpif(globalOptions.isDevelopENV(), replace(includeTplReg, function (match, p1, p2, p3, str) {
     var source = p2;
 
     if (!source.endsWith(".phtml")) {
@@ -56,7 +56,7 @@ function phtmlCompile() {
     } catch (error) {} finally {
       return "".concat(p1).concat(source).concat(p3);
     }
-  })).pipe(inlinesource()).on("error", swallowError).pipe(gulp.dest(globalOptions.getGulpDest()));
+  }))).pipe(inlinesource()).on("error", swallowError).pipe(gulp.dest(globalOptions.getGulpDest()));
 }
 
 module.exports = phtmlCompile;

@@ -37,20 +37,23 @@ function phtmlCompile() {
       })
     )
     .pipe(
-      replace(includeTplReg, function(match, p1, p2, p3, str) {
-        let source = p2;
-        if (!source.endsWith(".phtml")) {
-          source = `${source}.phtml`;
-        }
-        try {
-          const resourcePath = globalOptions.resolve(source, this.file.path);
-          source = resourcePath;
-        } catch (error) {
-        } finally {
-          return `${p1}${source}${p3}`;
-        }
-      })
-    )
+      gulpif(
+        globalOptions.isDevelopENV(),
+        replace(includeTplReg, function(match, p1, p2, p3, str) {
+          let source = p2;
+          if (!source.endsWith(".phtml")) {
+            source = `${source}.phtml`;
+          }
+          try {
+            const resourcePath = globalOptions.resolve(source, this.file.path);
+            source = resourcePath;
+          } catch (error) {
+          } finally {
+            return `${p1}${source}${p3}`;
+          }
+        })
+      )
+    ) // 开发环境生成编译路径
     .pipe(inlinesource())
     .on("error", swallowError)
     .pipe(gulp.dest(globalOptions.getGulpDest()));

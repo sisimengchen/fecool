@@ -78,7 +78,7 @@ class Options {
       optimization.retainExtname || this.__options.retainExtname || false;
     this.timestamp = output.timestamp || this.__options.timestamp;
     this.buildTimestamp = this.timestamp || +new Date();
-    this.hasha = output.hasha || this.__options.hasha || true;
+    this.hasha = output.hasha || this.__options.hasha || false;
     this.args = output.args || this.__options.args || {};
     this.ignoreExt = output.ignoreExt || [];
     this.envCode = undefined;

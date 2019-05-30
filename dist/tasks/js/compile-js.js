@@ -29,7 +29,21 @@ function jsCompile() {
     extension: ".js"
   })).pipe(printer(function (filepath) {
     return "js\u7F16\u8BD1\u4EFB\u52A1 ".concat(filepath);
-  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())).pipe(babel(getBabelOptions())).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
+  })).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())).pipe(gulpif(function (file) {
+    var path = file.path;
+    return !globalOptions.isModuleDirectory(path);
+  }, babel(getBabelOptions({
+    isES6Enabled: true,
+    isReactEnabled: false,
+    isCommonModules: false
+  })))).on("error", swallowError).pipe(gulpif(function (file) {
+    var path = file.path;
+    return globalOptions.isModuleDirectory(path);
+  }, babel(getBabelOptions({
+    isES6Enabled: true,
+    isReactEnabled: false,
+    isCommonModules: true
+  })))).on("error", swallowError).pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.write(globalOptions.sourceMapDirName, {
     sourceMappingURLPrefix: globalOptions.publicPath
   }))).pipe(rename(function (path, file) {
     if (path.extname === ".js") {

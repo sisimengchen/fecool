@@ -135,11 +135,14 @@ module.exports = declare((api, options) => {
                   result.transformFilename
                 );
               }
-              if (result.acitve) {
+              if (result.code) {
+                this.paramNameCaches[paramName + ""] = true;
+                this.dependNameCaches[paramName + ""] = dependName;
+                this.dependCodeCaches[paramName + ""] = result.code;
+                return false;
+              } else {
                 item.value = result.url || item.value;
                 return true;
-              } else {
-                return false;
               }
             });
           }

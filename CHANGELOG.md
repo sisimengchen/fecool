@@ -1,5 +1,11 @@
 # fecool changelog
 
+## 0.1.1
+
+### 修复bug
+
+- 修复common_modules下文件编译多包装一层require问题
+
 ## 0.1.0-alpha.7
 
 ### 迭代升级

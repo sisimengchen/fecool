@@ -144,11 +144,14 @@ module.exports = declare(function (api, options) {
                 getPackage().addDependency(moduleName4Package, result.transformFilename);
               }
 
-              if (result.acitve) {
+              if (result.code) {
+                _this.paramNameCaches[paramName + ""] = true;
+                _this.dependNameCaches[paramName + ""] = dependName;
+                _this.dependCodeCaches[paramName + ""] = result.code;
+                return false;
+              } else {
                 item.value = result.url || item.value;
                 return true;
-              } else {
-                return false;
               }
             });
           }

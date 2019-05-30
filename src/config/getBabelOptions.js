@@ -8,10 +8,11 @@ const getOptions = require("./getOptions");
 module.exports = function(
   options = {
     isES6Enabled: true,
-    isReactEnabled: false
+    isReactEnabled: false,
+    isCommonModules: false
   }
 ) {
-  let { isES6Enabled, isReactEnabled } = options;
+  let { isES6Enabled, isReactEnabled, isCommonModules } = options;
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   const babelOptions = {
     sourceType: "module",
@@ -28,7 +29,7 @@ module.exports = function(
           // useBuiltIns: "entry",
           useBuiltIns: false,
           targets: { browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"] },
-          modules: "amd"
+          modules: isCommonModules ? false : "amd"
           // debug: true
         }
       ],

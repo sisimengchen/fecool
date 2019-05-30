@@ -22,10 +22,34 @@ function jsxCompile() {
     .pipe(printer(filepath => `jsx编译任务 ${filepath}`))
     .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
     .pipe(
-      babel(
-        getBabelOptions({
-          isReactEnabled: true
-        })
+      gulpif(
+        file => {
+          const { path } = file;
+          return !globalOptions.isModuleDirectory(path);
+        },
+        babel(
+          getBabelOptions({
+            isES6Enabled: true,
+            isReactEnabled: true,
+            isCommonModules: false
+          })
+        )
+      )
+    )
+    .on("error", swallowError)
+    .pipe(
+      gulpif(
+        file => {
+          const { path } = file;
+          return globalOptions.isModuleDirectory(path);
+        },
+        babel(
+          getBabelOptions({
+            isES6Enabled: true,
+            isReactEnabled: true,
+            isCommonModules: true
+          })
+        )
       )
     )
     .on("error", swallowError)

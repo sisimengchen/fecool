@@ -1,5 +1,11 @@
 # fecool changelog
 
+## 0.1.3
+
+### 迭代升级
+
+- 取消使用@babel/plugin-transform-runtime，如果必要先自行在common目录引入polyfill.js，后续会考虑默认植入
+
 ## 0.1.1
 
 ### 修复bug

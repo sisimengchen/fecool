@@ -50,15 +50,6 @@ module.exports = function(
       isES6Enabled && [
         require("@babel/plugin-proposal-class-properties").default,
         { legacy: true }
-      ],
-      isES6Enabled && [
-        require("@babel/plugin-transform-runtime").default,
-        {
-          corejs: false,
-          helpers: false
-          // polyfill: false,
-          // regenerator: true
-        }
       ]
     ].filter(Boolean)
   };

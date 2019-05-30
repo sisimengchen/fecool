@@ -32,9 +32,6 @@ module.exports = function () {
       legacy: true
     }], isES6Enabled && [require("@babel/plugin-proposal-class-properties")["default"], {
       legacy: true
-    }], isES6Enabled && [require("@babel/plugin-transform-runtime")["default"], {
-      corejs: false,
-      helpers: false
     }]].filter(Boolean)
   };
   return babelOptions;

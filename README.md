@@ -14,6 +14,11 @@ fecool 前端工程构建工具。解决前端工程中，资源加载、依赖�
 - 其他资源 - 支持 hash 值生成功能
 - 开发服务器 - 内置 browser-sync + http-proxy-middleware，支持访问代理配置，ejs 模板 mock 生成功能
 
+### 示例
+
+[示例项目源码访问](https://github.com/sisimengchen/fecool_demos)
+[示例项目构建访问](https://sisimengchen.github.io/fecool_demos)
+
 ### 安装
 
 ```shell

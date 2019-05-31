@@ -115,7 +115,6 @@ class Package {
    */
   concatDependencies() {
     if (!this.isResovled) return;
-    const envCode = getOptions().getEnvCode();
     const moduleNames = Object.keys(this.dependenciesMap); // 依赖map中所有的key 也就是所有待打包代码的路径列表
     const moduleCount = moduleNames.length;
     if (!moduleCount) return false;
@@ -128,52 +127,9 @@ class Package {
         continue;
       }
       const modulePath = getOptions().mapEntry2Output(moduleName); // 映射到目标目录的地址
-      const concat = new Concat(false, "all.js", "\n");
-      const packageall = Promise.all(
-        dependencies.map((filePath, index) => {
-          // 优化方案common_modules中的单独打包
-          if (getOptions().isModuleDirectory(filePath)) {
-            return Promise.resolve({
-              filePath,
-              code: ""
-            });
-          }
-          return new Promise((resolve, reject) => {
-            const outPutPath = getOptions().mapEntry2Output(filePath);
-            fs.readFile(outPutPath, (err, data) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve({
-                  outPutPath,
-                  code: data.toString()
-                });
-              }
-            });
-          });
-        })
-      );
-      packageall
-        .then(datas => {
-          concat.add("env.js", envCode);
-          datas.forEach((data, index) => {
-            const { outPutPath, code } = data;
-            if (!code) return;
-            try {
-              concat.add(outPutPath, code);
-            } catch (error) {
-              console.log(outPutPath);
-              console.log(error);
-            }
-          });
-          const out = fs.createWriteStream(modulePath, {
-            encoding: "utf8"
-          });
-          out.write(concat.content);
-          out.end();
-        })
-        .catch(error => {});
+      this.executePackage(modulePath, dependencies, false);
     }
+    // 打包公共目录
     const completedCommonModules = [];
     const completedCommonCache = {};
     let commonModuleNames = Object.keys(commonModulesMap);
@@ -201,9 +157,32 @@ class Package {
         index++;
       }
     }
-    const commonModuleConcat = new Concat(false, "commonModule.js", "\n");
-    const packageallCommonModule = Promise.all(
-      completedCommonModules.map((filePath, index) => {
+    this.executePackage(
+      getOptions().getCommonModuleOutput(),
+      completedCommonModules,
+      true
+    );
+  }
+
+  /**
+   * 打包依赖列表中的的代码
+   */
+  executePackage(packagePath, dependencies = [], isModulePackage = false) {
+    if (!packagePath) return false;
+    if (!dependencies.length) return false;
+    const concat = new Concat(false, "all.js", "\n");
+    const packageall = Promise.all(
+      dependencies.map((filePath, index) => {
+        // 优化方案common_modules中的单独打包
+        if (
+          isModulePackage == false &&
+          getOptions().isModuleDirectory(filePath)
+        ) {
+          return Promise.resolve({
+            filePath,
+            code: ""
+          });
+        }
         return new Promise((resolve, reject) => {
           const outPutPath = getOptions().mapEntry2Output(filePath);
           fs.readFile(outPutPath, (err, data) => {
@@ -219,21 +198,24 @@ class Package {
         });
       })
     );
-    packageallCommonModule
+    packageall
       .then(datas => {
+        isModulePackage == false &&
+          concat.add("env.js", getOptions().getEnvCode());
         datas.forEach((data, index) => {
           const { outPutPath, code } = data;
+          if (!code) return;
           try {
-            commonModuleConcat.add(outPutPath, code);
+            concat.add(outPutPath, code);
           } catch (error) {
             console.log(outPutPath);
             console.log(error);
           }
         });
-        const out = fs.createWriteStream(getOptions().getCommonModuleOutput(), {
+        const out = fs.createWriteStream(packagePath, {
           encoding: "utf8"
         });
-        out.write(commonModuleConcat.content);
+        out.write(concat.content);
         out.end();
       })
       .catch(error => {});

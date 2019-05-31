@@ -119,74 +119,23 @@ var Package = function () {
   }, {
     key: "concatDependencies",
     value: function concatDependencies() {
-      var _this = this;
-
       if (!this.isResovled) return;
-      var envCode = getOptions().getEnvCode();
       var moduleNames = Object.keys(this.dependenciesMap);
       var moduleCount = moduleNames.length;
       if (!moduleCount) return false;
       var commonModulesMap = {};
 
-      var _loop = function _loop(i) {
+      for (var i = 0; i < moduleCount; i++) {
         var moduleName = moduleNames[i];
-        var dependencies = _this.dependenciesMap["" + moduleName];
+        var dependencies = this.dependenciesMap["" + moduleName];
 
         if (getOptions().isModuleDirectory(moduleName)) {
           commonModulesMap[moduleName + ""] = dependencies;
-          return "continue";
+          continue;
         }
 
         var modulePath = getOptions().mapEntry2Output(moduleName);
-        var concat = new Concat(false, "all.js", "\n");
-        var packageall = Promise.all(dependencies.map(function (filePath, index) {
-          if (getOptions().isModuleDirectory(filePath)) {
-            return Promise.resolve({
-              filePath: filePath,
-              code: ""
-            });
-          }
-
-          return new Promise(function (resolve, reject) {
-            var outPutPath = getOptions().mapEntry2Output(filePath);
-            fs.readFile(outPutPath, function (err, data) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve({
-                  outPutPath: outPutPath,
-                  code: data.toString()
-                });
-              }
-            });
-          });
-        }));
-        packageall.then(function (datas) {
-          concat.add("env.js", envCode);
-          datas.forEach(function (data, index) {
-            var outPutPath = data.outPutPath,
-                code = data.code;
-            if (!code) return;
-
-            try {
-              concat.add(outPutPath, code);
-            } catch (error) {
-              console.log(outPutPath);
-              console.log(error);
-            }
-          });
-          var out = fs.createWriteStream(modulePath, {
-            encoding: "utf8"
-          });
-          out.write(concat.content);
-          out.end();
-        })["catch"](function (error) {});
-      };
-
-      for (var i = 0; i < moduleCount; i++) {
-        var _ret = _loop(i);
-
-        if (_ret === "continue") continue;
+        this.executePackage(modulePath, dependencies, false);
       }
 
       var completedCommonModules = [];
@@ -196,7 +145,7 @@ var Package = function () {
       if (!commonModuleCount) return false;
       var index = 0;
 
-      var _loop2 = function _loop2() {
+      var _loop = function _loop() {
         var moduleName = commonModuleNames[index];
         var dependencies = commonModulesMap["" + moduleName];
         var filters = dependencies.filter(function (item) {
@@ -220,11 +169,27 @@ var Package = function () {
       };
 
       while (commonModuleNames.length) {
-        _loop2();
+        _loop();
       }
 
-      var commonModuleConcat = new Concat(false, "commonModule.js", "\n");
-      var packageallCommonModule = Promise.all(completedCommonModules.map(function (filePath, index) {
+      this.executePackage(getOptions().getCommonModuleOutput(), completedCommonModules, true);
+    }
+  }, {
+    key: "executePackage",
+    value: function executePackage(packagePath) {
+      var dependencies = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+      var isModulePackage = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      if (!packagePath) return false;
+      if (!dependencies.length) return false;
+      var concat = new Concat(false, "all.js", "\n");
+      var packageall = Promise.all(dependencies.map(function (filePath, index) {
+        if (isModulePackage == false && getOptions().isModuleDirectory(filePath)) {
+          return Promise.resolve({
+            filePath: filePath,
+            code: ""
+          });
+        }
+
         return new Promise(function (resolve, reject) {
           var outPutPath = getOptions().mapEntry2Output(filePath);
           fs.readFile(outPutPath, function (err, data) {
@@ -239,22 +204,24 @@ var Package = function () {
           });
         });
       }));
-      packageallCommonModule.then(function (datas) {
+      packageall.then(function (datas) {
+        isModulePackage == false && concat.add("env.js", getOptions().getEnvCode());
         datas.forEach(function (data, index) {
           var outPutPath = data.outPutPath,
               code = data.code;
+          if (!code) return;
 
           try {
-            commonModuleConcat.add(outPutPath, code);
+            concat.add(outPutPath, code);
           } catch (error) {
             console.log(outPutPath);
             console.log(error);
           }
         });
-        var out = fs.createWriteStream(getOptions().getCommonModuleOutput(), {
+        var out = fs.createWriteStream(packagePath, {
           encoding: "utf8"
         });
-        out.write(commonModuleConcat.content);
+        out.write(concat.content);
         out.end();
       })["catch"](function (error) {});
     }

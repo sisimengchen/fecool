@@ -1,5 +1,11 @@
 # fecool changelog
 
+## 0.1.4
+
+### 构建优化
+
+- 单独打包common_modules目录下的js成common/commonmodules.js
+
 ## 0.1.3
 
 ### 迭代升级

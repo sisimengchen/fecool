@@ -125,14 +125,28 @@ var Package = function () {
       var envCode = getOptions().getEnvCode();
       var moduleNames = Object.keys(this.dependenciesMap);
       var moduleCount = moduleNames.length;
-      if (!moduleNames.length) return false;
+      if (!moduleCount) return false;
+      var commonModulesMap = {};
 
       var _loop = function _loop(i) {
         var moduleName = moduleNames[i];
         var dependencies = _this.dependenciesMap["" + moduleName];
+
+        if (getOptions().isModuleDirectory(moduleName)) {
+          commonModulesMap[moduleName + ""] = dependencies;
+          return "continue";
+        }
+
         var modulePath = getOptions().mapEntry2Output(moduleName);
         var concat = new Concat(false, "all.js", "\n");
         var packageall = Promise.all(dependencies.map(function (filePath, index) {
+          if (getOptions().isModuleDirectory(filePath)) {
+            return Promise.resolve({
+              filePath: filePath,
+              code: ""
+            });
+          }
+
           return new Promise(function (resolve, reject) {
             var outPutPath = getOptions().mapEntry2Output(filePath);
             fs.readFile(outPutPath, function (err, data) {
@@ -152,6 +166,7 @@ var Package = function () {
           datas.forEach(function (data, index) {
             var outPutPath = data.outPutPath,
                 code = data.code;
+            if (!code) return;
 
             try {
               concat.add(outPutPath, code);
@@ -169,8 +184,79 @@ var Package = function () {
       };
 
       for (var i = 0; i < moduleCount; i++) {
-        _loop(i);
+        var _ret = _loop(i);
+
+        if (_ret === "continue") continue;
       }
+
+      var completedCommonModules = [];
+      var completedCommonCache = {};
+      var commonModuleNames = Object.keys(commonModulesMap);
+      var commonModuleCount = commonModuleNames.length;
+      if (!commonModuleCount) return false;
+      var index = 0;
+
+      var _loop2 = function _loop2() {
+        var moduleName = commonModuleNames[index];
+        var dependencies = commonModulesMap["" + moduleName];
+        var filters = dependencies.filter(function (item) {
+          if (completedCommonCache["" + item]) {
+            return false;
+          } else {
+            return true;
+          }
+        });
+
+        if (filters.length == 1) {
+          completedCommonModules.push(moduleName);
+          completedCommonCache["" + moduleName] = true;
+          commonModuleNames = commonModuleNames.filter(function (item) {
+            return item != moduleName;
+          });
+          index = 0;
+        } else {
+          index++;
+        }
+      };
+
+      while (commonModuleNames.length) {
+        _loop2();
+      }
+
+      var commonModuleConcat = new Concat(false, "commonModule.js", "\n");
+      var packageallCommonModule = Promise.all(completedCommonModules.map(function (filePath, index) {
+        return new Promise(function (resolve, reject) {
+          var outPutPath = getOptions().mapEntry2Output(filePath);
+          fs.readFile(outPutPath, function (err, data) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({
+                outPutPath: outPutPath,
+                code: data.toString()
+              });
+            }
+          });
+        });
+      }));
+      packageallCommonModule.then(function (datas) {
+        datas.forEach(function (data, index) {
+          var outPutPath = data.outPutPath,
+              code = data.code;
+
+          try {
+            commonModuleConcat.add(outPutPath, code);
+          } catch (error) {
+            console.log(outPutPath);
+            console.log(error);
+          }
+        });
+        var out = fs.createWriteStream(getOptions().getCommonModuleOutput(), {
+          encoding: "utf8"
+        });
+        out.write(commonModuleConcat.content);
+        out.end();
+      })["catch"](function (error) {});
     }
   }]);
 

@@ -99,6 +99,11 @@ var Options = function () {
       return "{".concat(list.join(","), "}");
     }
   }, {
+    key: "getCommonModuleOutput",
+    value: function getCommonModuleOutput() {
+      return this.mapEntry2Output(path.join(this.distCommonDir, "commonmodule.js"));
+    }
+  }, {
     key: "isDebug",
     value: function isDebug() {
       return !!this.__options.debug;

@@ -116,16 +116,28 @@ class Package {
   concatDependencies() {
     if (!this.isResovled) return;
     const envCode = getOptions().getEnvCode();
-    const moduleNames = Object.keys(this.dependenciesMap);
+    const moduleNames = Object.keys(this.dependenciesMap); // 依赖map中所有的key 也就是所有待打包代码的路径列表
     const moduleCount = moduleNames.length;
-    if (!moduleNames.length) return false;
+    if (!moduleCount) return false;
+    const commonModulesMap = {};
     for (let i = 0; i < moduleCount; i++) {
       const moduleName = moduleNames[i];
-      const dependencies = this.dependenciesMap["" + moduleName];
-      const modulePath = getOptions().mapEntry2Output(moduleName);
+      const dependencies = this.dependenciesMap["" + moduleName]; // 获取待打包代码的依赖列表
+      if (getOptions().isModuleDirectory(moduleName)) {
+        commonModulesMap[moduleName + ""] = dependencies;
+        continue;
+      }
+      const modulePath = getOptions().mapEntry2Output(moduleName); // 映射到目标目录的地址
       const concat = new Concat(false, "all.js", "\n");
       const packageall = Promise.all(
         dependencies.map((filePath, index) => {
+          // 优化方案common_modules中的单独打包
+          if (getOptions().isModuleDirectory(filePath)) {
+            return Promise.resolve({
+              filePath,
+              code: ""
+            });
+          }
           return new Promise((resolve, reject) => {
             const outPutPath = getOptions().mapEntry2Output(filePath);
             fs.readFile(outPutPath, (err, data) => {
@@ -146,6 +158,7 @@ class Package {
           concat.add("env.js", envCode);
           datas.forEach((data, index) => {
             const { outPutPath, code } = data;
+            if (!code) return;
             try {
               concat.add(outPutPath, code);
             } catch (error) {
@@ -161,6 +174,69 @@ class Package {
         })
         .catch(error => {});
     }
+    const completedCommonModules = [];
+    const completedCommonCache = {};
+    let commonModuleNames = Object.keys(commonModulesMap);
+    const commonModuleCount = commonModuleNames.length;
+    if (!commonModuleCount) return false;
+    let index = 0;
+    while (commonModuleNames.length) {
+      const moduleName = commonModuleNames[index];
+      const dependencies = commonModulesMap["" + moduleName];
+      const filters = dependencies.filter(item => {
+        if (completedCommonCache["" + item]) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+      if (filters.length == 1) {
+        completedCommonModules.push(moduleName);
+        completedCommonCache["" + moduleName] = true;
+        commonModuleNames = commonModuleNames.filter(
+          item => item != moduleName
+        );
+        index = 0;
+      } else {
+        index++;
+      }
+    }
+    const commonModuleConcat = new Concat(false, "commonModule.js", "\n");
+    const packageallCommonModule = Promise.all(
+      completedCommonModules.map((filePath, index) => {
+        return new Promise((resolve, reject) => {
+          const outPutPath = getOptions().mapEntry2Output(filePath);
+          fs.readFile(outPutPath, (err, data) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({
+                outPutPath,
+                code: data.toString()
+              });
+            }
+          });
+        });
+      })
+    );
+    packageallCommonModule
+      .then(datas => {
+        datas.forEach((data, index) => {
+          const { outPutPath, code } = data;
+          try {
+            commonModuleConcat.add(outPutPath, code);
+          } catch (error) {
+            console.log(outPutPath);
+            console.log(error);
+          }
+        });
+        const out = fs.createWriteStream(getOptions().getCommonModuleOutput(), {
+          encoding: "utf8"
+        });
+        out.write(commonModuleConcat.content);
+        out.end();
+      })
+      .catch(error => {});
   }
 }
 

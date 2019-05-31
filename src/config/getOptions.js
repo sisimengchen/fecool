@@ -95,6 +95,10 @@ class Options {
     return `{${list.join(",")}}`;
   }
 
+  getCommonModuleOutput() {
+    return this.mapEntry2Output(path.join(this.distCommonDir, "commonmodule.js"));
+  }
+
   /**
    * [判断是否开启debug]
    * @return {[Boolean]}           [是否开启debug]

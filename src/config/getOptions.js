@@ -56,6 +56,7 @@ class Options {
         ? excludePath
         : path.join(this.context, excludePath);
     });
+    this.tinytooljs = entry.tinytooljs || false;
     this.distDir = path.isAbsolute(output.path)
       ? output.path
       : path.join(this.context, output.path);

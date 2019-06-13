@@ -1,5 +1,11 @@
 # fecool changelog
 
+## 0.1.5
+
+### 配置优化
+
+- 增加entry.tinytooljs配置true则默认引入tinytooljs编译逻辑
+
 ## 0.1.4
 
 ### 构建优化

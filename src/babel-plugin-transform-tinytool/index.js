@@ -5,6 +5,10 @@ const t = types;
 
 const { KEYWORD, getID } = require("./utils");
 
+const { getOptions } = require("../config");
+
+const globalOptions = getOptions();
+
 module.exports = declare((api, options, dirname) => {
   api.assertVersion(7);
   const { loose, allowTopLevelThis, strict, strictMode, noInterop } = options;
@@ -21,13 +25,19 @@ module.exports = declare((api, options, dirname) => {
         enter(path, { opts }) {
           const { parent } = path;
           const { comments = [] } = parent;
+          if (globalOptions.tinytooljs) {
+            comments[0] = {
+              type: 'CommentBlock',
+              value: `@${KEYWORD}`
+            }
+          }
           if (!comments.length) return;
           const comment = comments[0];
           const { type, value } = comment;
           if (
-            type === "CommentBlock" &&
-            value &&
-            value.trim() === `@${KEYWORD}`
+            (type === "CommentBlock" &&
+              value &&
+              value.trim() === `@${KEYWORD}`)
           ) {
             this.isTinytooljs = true;
             path.hub.file.isTinytooljs = true;

@@ -66,6 +66,7 @@ var Options = function () {
       this.exclude = (entry.exclude || []).map(function (excludePath, index) {
         return path.isAbsolute(excludePath) ? excludePath : path.join(_this.context, excludePath);
       });
+      this.tinytooljs = entry.tinytooljs || false;
       this.distDir = path.isAbsolute(output.path) ? output.path : path.join(this.context, output.path);
       this.distCommonDir = path.isAbsolute(output.common) ? output.common : path.join(this.context, output.common);
       this.publicPath = output.publicPath;

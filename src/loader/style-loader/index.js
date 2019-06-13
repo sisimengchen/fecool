@@ -5,66 +5,7 @@ const { printer } = require("../../util");
 const { template } = require("@babel/core");
 const generate = require("@babel/generator").default;
 
-const codeWrapper = template(`
-  define('NAME', function() {
-    return (function(style) {
-      var useCount = 0;
-  
-      var headElement;
-      var firstLinkElement;
-      var styleElement;
-  
-      function use() {
-        if (useCount++ > 0) {
-          return;
-        }
-  
-        if (!headElement) {
-          headElement = document.head || document.getElementsByTagName('head')[0];
-        }
-  
-        if (!firstLinkElement) {
-          var linkElements = headElement.getElementsByTagName('link');
-          for (var i = 0, l = linkElements.length; i < l; ++i) {
-            if (linkElements[i].rel === 'stylesheet') {
-              firstLinkElement = linkElements[i];
-              break;
-            }
-          }
-        }
-  
-        if (!styleElement) {
-          styleElement = document.createElement('style');
-          firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);
-          styleElement.setAttribute('type', 'text/css');
-          // styleElement.setAttribute('data-src', '<%= src%>');
-          if (styleElement.styleSheet) {
-            styleElement.styleSheet.cssText = style;
-          } else {
-            styleElement.appendChild(document.createTextNode(style));
-          }
-        } else {
-          firstLinkElement ? headElement.insertBefore(styleElement, firstLinkElement) : headElement.appendChild(styleElement);
-        }
-      }
-  
-      function unuse() {
-        if (useCount === 0) {
-          return;
-        }
-  
-        if (--useCount === 0) {
-          headElement.removeChild(styleElement);
-        }
-      }
-  
-      return {
-        use: use,
-        unuse: unuse
-      };
-    })('VALUE')
-  })
-`);
+const codeWrapper = template(`define("NAME",function(){return(function(d){var e=0;var f;var c;var a;function b(){if(e++>0){return}if(!f){f=document.head||document.getElementsByTagName("head")[0]}if(!c){var k=f.getElementsByTagName("link");for(var j=0,h=k.length;j<h;++j){if(k[j].rel==="stylesheet"){c=k[j];break}}}if(!a){a=document.createElement("style");c?f.insertBefore(a,c):f.appendChild(a);a.setAttribute("type","text/css");if(a.styleSheet){a.styleSheet.cssText=d}else{a.appendChild(document.createTextNode(d))}}else{c?f.insertBefore(a,c):f.appendChild(a)}}function g(){if(e===0){return}if(--e===0){f.removeChild(a)}}return{use:b,unuse:g}})("VALUE")});`);
 
 const defaultOptions = {};
 

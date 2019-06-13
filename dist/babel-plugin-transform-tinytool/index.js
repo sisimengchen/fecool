@@ -12,6 +12,10 @@ var _require3 = require("./utils"),
     KEYWORD = _require3.KEYWORD,
     getID = _require3.getID;
 
+var _require4 = require("../config"),
+    getOptions = _require4.getOptions;
+
+var globalOptions = getOptions();
 module.exports = declare(function (api, options, dirname) {
   api.assertVersion(7);
   var loose = options.loose,
@@ -36,6 +40,14 @@ module.exports = declare(function (api, options, dirname) {
           var parent = path.parent;
           var _parent$comments = parent.comments,
               comments = _parent$comments === void 0 ? [] : _parent$comments;
+
+          if (globalOptions.tinytooljs) {
+            comments[0] = {
+              type: 'CommentBlock',
+              value: "@".concat(KEYWORD)
+            };
+          }
+
           if (!comments.length) return;
           var comment = comments[0];
           var type = comment.type,

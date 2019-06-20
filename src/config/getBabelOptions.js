@@ -16,7 +16,6 @@ module.exports = function(
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   const babelOptions = {
     sourceType: "module",
-    // retainLines: getOptions().isDevelopENV() ? true : false,
     compact: getOptions().isDevelopENV() ? false : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,
@@ -26,11 +25,9 @@ module.exports = function(
         require("@babel/preset-env").default,
         {
           ignoreBrowserslistConfig: true,
-          // useBuiltIns: "entry",
           useBuiltIns: false,
           targets: { browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"] },
-          modules: isCommonModules ? false : "amd"
-          // debug: true
+          modules: "amd"
         }
       ],
       isReactEnabled && [
@@ -42,7 +39,8 @@ module.exports = function(
       ]
     ].filter(Boolean),
     plugins: [
-      [require("../babel-plugin-transform-tinytool")], // 最先执行tinytool代码的转换
+      [require("../babel-plugin-fecool-helper")],
+      [require("../babel-plugin-transform-tinytool")], // 执行tinytool代码的转换
       isES6Enabled && [
         require("@babel/plugin-proposal-decorators").default,
         { legacy: true }

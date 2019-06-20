@@ -16,63 +16,42 @@ const { swallowError, extname } = require("../../util");
 const globalOptions = getOptions();
 
 function jsxCompile() {
-  return gulp
-    .src(globalOptions.getGulpSrc("jsx", false, true)) // 对于非common目录下的所有.jsx资源执行
-    .pipe(changed(globalOptions.getGulpDest(), { extension: ".js" }))
-    .pipe(printer(filepath => `jsx编译任务 ${filepath}`))
-    .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
-    .pipe(
-      gulpif(
-        file => {
-          const { path } = file;
-          return !globalOptions.isModuleDirectory(path);
-        },
+  return (
+    gulp
+      .src(globalOptions.getGulpSrc("jsx", false, true)) // 对于非common目录下的所有.jsx资源执行
+      .pipe(changed(globalOptions.getGulpDest(), { extension: ".js" }))
+      .pipe(printer(filepath => `jsx编译任务 ${filepath}`))
+      .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
+      .pipe(
         babel(
           getBabelOptions({
             isES6Enabled: true,
-            isReactEnabled: true,
-            isCommonModules: false
+            isReactEnabled: true
           })
         )
       )
-    )
-    .on("error", swallowError)
-    .pipe(
-      gulpif(
-        file => {
-          const { path } = file;
-          return globalOptions.isModuleDirectory(path);
-        },
-        babel(
-          getBabelOptions({
-            isES6Enabled: true,
-            isReactEnabled: true,
-            isCommonModules: true
+      .on("error", swallowError)
+      .pipe(
+        gulpif(
+          globalOptions.isDevelopENV(),
+          sourcemaps.write(globalOptions.sourceMapDirName, {
+            sourceMappingURLPrefix: globalOptions.publicPath
           })
         )
       )
-    )
-    .on("error", swallowError)
-    .pipe(
-      gulpif(
-        globalOptions.isDevelopENV(),
-        sourcemaps.write(globalOptions.sourceMapDirName, {
-          sourceMappingURLPrefix: globalOptions.publicPath
+      .pipe(
+        rename(function(path, file) {
+          if (path.extname === ".js") {
+            const module = globalOptions.getModule(extname(file.path, ".jsx"));
+            const hashCode = module.hashCode;
+            path.basename = hashCode
+              ? `${path.basename}.${hashCode}`
+              : path.basename;
+          }
         })
       )
-    )
-    .pipe(
-      rename(function(path, file) {
-        if (path.extname === ".js") {
-          const module = globalOptions.getModule(extname(file.path, ".jsx"));
-          const hashCode = module.hashCode;
-          path.basename = hashCode
-            ? `${path.basename}.${hashCode}`
-            : path.basename;
-        }
-      })
-    )
-    .pipe(gulp.dest(globalOptions.getGulpDest()));
+      .pipe(gulp.dest(globalOptions.getGulpDest()))
+  );
 }
 
 module.exports = jsxCompile;

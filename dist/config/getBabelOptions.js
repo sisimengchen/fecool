@@ -23,12 +23,12 @@ module.exports = function () {
       targets: {
         browsers: ["Android >= 4.0", "ios >= 8", "ie >=9"]
       },
-      modules: isCommonModules ? false : "amd"
+      modules: "amd"
     }], isReactEnabled && [require("@babel/preset-react")["default"], {
       development: false,
       useBuiltIns: true
     }]].filter(Boolean),
-    plugins: [[require("../babel-plugin-transform-tinytool")], isES6Enabled && [require("@babel/plugin-proposal-decorators")["default"], {
+    plugins: [[require("../babel-plugin-fecool-helper")], [require("../babel-plugin-transform-tinytool")], isES6Enabled && [require("@babel/plugin-proposal-decorators")["default"], {
       legacy: true
     }], isES6Enabled && [require("@babel/plugin-proposal-class-properties")["default"], {
       legacy: true

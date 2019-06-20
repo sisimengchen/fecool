@@ -1,5 +1,11 @@
 # fecool changelog
 
+## 0.1.6
+
+### 迭代升级
+
+- 通过/* @umdjs */注释跳过babel-plugin-transform-modules-amd的多余包装
+
 ## 0.1.5
 
 ### 配置优化

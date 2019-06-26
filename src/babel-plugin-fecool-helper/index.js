@@ -15,8 +15,7 @@ module.exports = declare((api, options, dirname) => {
         enter(path, state) {
           const { parent } = path;
           const { comments = [] } = parent;
-          if (!comments.length) return;
-          const comment = comments[0];
+          const comment = comments[0] || {};
           const { type, value } = comment;
           // 通过注释修改program的sourceType
           if (
@@ -57,14 +56,25 @@ module.exports = declare((api, options, dirname) => {
                   if (t.isFunctionExpression(lastArgument)) {
                     this.file.set("sourceType", "amd");
                     path.stop();
+                    return;
                   }
                 }
                 // 开始umd解析
-                if (
-                  t.isFunctionExpression(path.node.expression.callee) &&
-                  t.isBlockStatement(path.node.expression.callee.body)
+                let callExpression = undefined;
+                if (t.isCallExpression(path.node.expression)) {
+                  callExpression = path.node.expression;
+                } else if (
+                  t.isUnaryExpression(path.node.expression) &&
+                  t.isCallExpression(path.node.expression.argument)
                 ) {
-                  const args = path.node.expression.arguments || [];
+                  callExpression = path.node.expression.argument;
+                }
+                if (
+                  callExpression &&
+                  t.isFunctionExpression(callExpression.callee) &&
+                  t.isBlockStatement(callExpression.callee.body)
+                ) {
+                  const args = callExpression.arguments || [];
                   if (!args.length) return;
                   const lastArgument = args[args.length - 1];
                   if (t.isFunctionExpression(lastArgument)) {

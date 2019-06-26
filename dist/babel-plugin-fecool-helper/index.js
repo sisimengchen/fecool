@@ -28,8 +28,7 @@ module.exports = declare(function (api, options, dirname) {
           var parent = path.parent;
           var _parent$comments = parent.comments,
               comments = _parent$comments === void 0 ? [] : _parent$comments;
-          if (!comments.length) return;
-          var comment = comments[0];
+          var comment = comments[0] || {};
           var type = comment.type,
               value = comment.value;
 
@@ -58,11 +57,20 @@ module.exports = declare(function (api, options, dirname) {
                     _this.file.set("sourceType", "amd");
 
                     path.stop();
+                    return;
                   }
                 }
 
-                if (t.isFunctionExpression(path.node.expression.callee) && t.isBlockStatement(path.node.expression.callee.body)) {
-                  var _args = path.node.expression.arguments || [];
+                var callExpression = undefined;
+
+                if (t.isCallExpression(path.node.expression)) {
+                  callExpression = path.node.expression;
+                } else if (t.isUnaryExpression(path.node.expression) && t.isCallExpression(path.node.expression.argument)) {
+                  callExpression = path.node.expression.argument;
+                }
+
+                if (callExpression && t.isFunctionExpression(callExpression.callee) && t.isBlockStatement(callExpression.callee.body)) {
+                  var _args = callExpression.arguments || [];
 
                   if (!_args.length) return;
                   var _lastArgument = _args[_args.length - 1];

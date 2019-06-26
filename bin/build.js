@@ -4,6 +4,7 @@ const asciiArt = require("../dist/util/asciiArt");
 
 module.exports = function init() {
   asciiArt("fecool");
+  printer.log("当前版本：", process.env.FECOOL_VERSION);
   const globalOptions = getOptions();
   if (globalOptions.isWatch()) {
     const watchBuild = require("../dist/tasks/main/watch");

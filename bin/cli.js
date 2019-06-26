@@ -19,7 +19,7 @@ program
 
 process.env.NODE_ENV = program.environment || "production";
 
-process.env.VERSION = require("../package.json").version;
+process.env.FECOOL_VERSION = require("../package.json").version;
 
 if (program.debug) {
   process.env.DEBUG = "debug";

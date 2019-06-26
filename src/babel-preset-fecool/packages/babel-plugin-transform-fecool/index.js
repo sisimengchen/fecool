@@ -41,7 +41,7 @@ module.exports = declare((api, options) => {
     visitor: {
       CallExpression: {
         // 解出被顶层define所包裹的代码，导出成类似于cmd的方式
-        enter(path, { opts }) {
+        enter(path, state) {
           const { node, parent } = path;
           const calleeName = node.callee.name;
           const isAmd = calleeName === REQUIRE || calleeName === DEFINE;
@@ -89,7 +89,6 @@ module.exports = declare((api, options) => {
           // callback可以是一个函数表达式  也可以是一个变量
           if (!t.isFunctionExpression(callback) && !t.isIdentifier(callback))
             return;
-
           printer.debug("解析依赖开始", this.filename);
           const module = globalOptions.getModule(this.filename); // 生成模块对象
           const moduleName4Package = module.transformFilename;

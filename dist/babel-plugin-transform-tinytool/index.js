@@ -9,7 +9,6 @@ var _require2 = require("@babel/core"),
 var t = types;
 
 var _require3 = require("./utils"),
-    KEYWORD = _require3.KEYWORD,
     getID = _require3.getID;
 
 var _require4 = require("../config"),
@@ -26,40 +25,23 @@ module.exports = declare(function (api, options, dirname) {
   return {
     name: "transform-tinytool",
     pre: function pre(file) {
-      file.isTinytooljs = false;
-      this.isTinytooljs = false;
+      this.isTinytoolJS = false;
       this.isExpressionStatementOver = false;
-      this.temp = [];
+      this.importDeclarations = [];
     },
     visitor: {
       Program: {
-        enter: function enter(path, _ref) {
+        enter: function enter(path, state) {
           var _this = this;
 
-          var opts = _ref.opts;
-          var parent = path.parent;
-          var _parent$comments = parent.comments,
-              comments = _parent$comments === void 0 ? [] : _parent$comments;
+          var sourceType = globalOptions.tinytooljs ? "tinytooljs" : this.file.get("sourceType");
 
-          if (globalOptions.tinytooljs) {
-            comments[0] = {
-              type: 'CommentBlock',
-              value: "@".concat(KEYWORD)
-            };
-          }
-
-          if (!comments.length) return;
-          var comment = comments[0];
-          var type = comment.type,
-              value = comment.value;
-
-          if (type === "CommentBlock" && value && value.trim() === "@".concat(KEYWORD)) {
-            this.isTinytooljs = true;
-            path.hub.file.isTinytooljs = true;
-            if (!this.isTinytooljs) return;
+          if (sourceType === "tinytooljs") {
+            this.file.set("isTinytoolJS", true);
+            this.isTinytoolJS = true;
             path.traverse({
               VariableDeclaration: function VariableDeclaration(path) {
-                if (!_this.isTinytooljs) return;
+                if (!_this.isTinytoolJS) return;
                 var node = path.node,
                     parent = path.parent;
                 var _node$declarations = node.declarations,
@@ -88,7 +70,7 @@ module.exports = declare(function (api, options, dirname) {
                             source = "".concat(source, ".json");
                           }
 
-                          _this.temp.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(id.name))], t.stringLiteral(source)));
+                          _this.importDeclarations.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(id.name))], t.stringLiteral(source)));
 
                           path.remove();
                         }
@@ -110,9 +92,9 @@ module.exports = declare(function (api, options, dirname) {
 
                           var identifierName = getID(id.name);
 
-                          _this.temp.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(identifierName))], t.stringLiteral(_source)));
+                          _this.importDeclarations.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(identifierName))], t.stringLiteral(_source)));
 
-                          _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.CallExpression(t.identifier(identifierName), []))]));
+                          _this.importDeclarations.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.CallExpression(t.identifier(identifierName), []))]));
 
                           path.remove();
                         }
@@ -138,18 +120,20 @@ module.exports = declare(function (api, options, dirname) {
 
                         var _identifierName = getID(id.name);
 
-                        _this.temp.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(_identifierName))], t.stringLiteral(_source2)));
+                        _this.importDeclarations.push(t.importDeclaration([t.importDefaultSpecifier(t.identifier(_identifierName))], t.stringLiteral(_source2)));
 
-                        _this.temp.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.memberExpression(t.identifier(_identifierName), t.identifier(init.property.name)))]));
+                        _this.importDeclarations.push(t.variableDeclaration("var", [t.variableDeclarator(t.identifier(id.name), t.memberExpression(t.identifier(_identifierName), t.identifier(init.property.name)))]));
 
                         path.remove();
                       }
                     }
                   }
                 }
-              },
+              }
+            });
+            path.traverse({
               ExpressionStatement: function ExpressionStatement(path) {
-                if (!_this.isTinytooljs) return;
+                if (!_this.isTinytoolJS) return;
                 if (_this.isExpressionStatementOver) return;
                 var node = path.node,
                     parent = path.parent;
@@ -167,11 +151,11 @@ module.exports = declare(function (api, options, dirname) {
                 _this.isExpressionStatementOver = true;
               }
             });
+
+            if (this.importDeclarations.length) {
+              path.unshiftContainer("body", this.importDeclarations);
+            }
           }
-        },
-        exit: function exit(path) {
-          if (!this.isTinytooljs) return;
-          path.unshiftContainer("body", this.temp);
         }
       }
     }

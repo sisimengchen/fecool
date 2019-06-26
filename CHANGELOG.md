@@ -1,5 +1,14 @@
 # fecool changelog
 
+## 0.1.7
+
+### 构建优化
+
+- 给babel-plugin-fecool-helper增加js代码类型判断功能
+- 优化babel-plugin-transform-tinytool代码转化过程
+- 优化getBabelOptions配置不受外部配置文件干扰
+- 优化json-loader，style-loader，template-loader使得在生产环境支持代码压缩
+
 ## 0.1.6
 
 ### 迭代升级

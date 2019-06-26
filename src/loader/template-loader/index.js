@@ -3,10 +3,10 @@ const fs = require("fs");
 const { getOptions } = require("../../config");
 const minify = require("html-minifier").minify;
 const { printer } = require("../../util");
-const { template } = require("@babel/core");
+const babel = require("@babel/core");
 const generate = require("@babel/generator").default;
 
-const codeWrapper = template(`
+const codeWrapper = babel.template(`
   define('NAME', function() {
     return 'VALUE';
   })
@@ -58,9 +58,27 @@ module.exports = function({ dependName, paramName, filename }, options = {}) {
         VALUE: source
       });
       const code = generate(ast).code;
-      fs.writeFile(module.distFilename, code, "utf8", error => {
-        if (error) throw err;
-      });
+      if (getOptions().isDevelopENV()) {
+        fs.writeFile(module.distFilename, code, "utf8", error => {
+          if (error) throw err;
+        });
+      } else {
+        babel.transform(
+          code,
+          {
+            configFile: false,
+            babelrc: false,
+            minified: true,
+            compact: true
+          },
+          function(error, result) {
+            if (error) throw err;
+            fs.writeFile(module.distFilename, result.code, "utf8", error => {
+              if (error) throw err;
+            });
+          }
+        );
+      }
     }
   } catch (error) {
     printer.error(error);

@@ -3,7 +3,7 @@ const { declare } = require("@babel/helper-plugin-utils");
 const { types } = require("@babel/core");
 const t = types;
 
-const { KEYWORD, getID } = require("./utils");
+const { getID } = require("./utils");
 
 const { getOptions } = require("../config");
 
@@ -15,36 +15,22 @@ module.exports = declare((api, options, dirname) => {
   return {
     name: "transform-tinytool",
     pre(file) {
-      file.isTinytooljs = false;
-      this.isTinytooljs = false;
+      this.isTinytoolJS = false;
       this.isExpressionStatementOver = false;
-      this.temp = [];
+      this.importDeclarations = [];
     },
     visitor: {
       Program: {
-        enter(path, { opts }) {
-          const { parent } = path;
-          const { comments = [] } = parent;
-          if (globalOptions.tinytooljs) {
-            comments[0] = {
-              type: 'CommentBlock',
-              value: `@${KEYWORD}`
-            }
-          }
-          if (!comments.length) return;
-          const comment = comments[0];
-          const { type, value } = comment;
-          if (
-            (type === "CommentBlock" &&
-              value &&
-              value.trim() === `@${KEYWORD}`)
-          ) {
-            this.isTinytooljs = true;
-            path.hub.file.isTinytooljs = true;
-            if (!this.isTinytooljs) return;
+        enter(path, state) {
+          const sourceType = globalOptions.tinytooljs
+            ? "tinytooljs"
+            : this.file.get("sourceType");
+          if (sourceType === "tinytooljs") {
+            this.file.set("isTinytoolJS", true);
+            this.isTinytoolJS = true;
             path.traverse({
               VariableDeclaration: path => {
-                if (!this.isTinytooljs) return;
+                if (!this.isTinytoolJS) return;
                 // 这个要针对老代码做依赖收集，遍历变量定义的path，依赖收集
                 const { node, parent } = path;
                 const { declarations = [] } = node;
@@ -68,7 +54,7 @@ module.exports = declare((api, options, dirname) => {
                           } else if (name === "__includejson") {
                             source = `${source}.json`;
                           }
-                          this.temp.push(
+                          this.importDeclarations.push(
                             t.importDeclaration(
                               [t.importDefaultSpecifier(t.identifier(id.name))],
                               t.stringLiteral(source)
@@ -93,7 +79,7 @@ module.exports = declare((api, options, dirname) => {
                             source = `${source}.json`;
                           }
                           const identifierName = getID(id.name);
-                          this.temp.push(
+                          this.importDeclarations.push(
                             t.importDeclaration(
                               [
                                 t.importDefaultSpecifier(
@@ -103,7 +89,7 @@ module.exports = declare((api, options, dirname) => {
                               t.stringLiteral(source)
                             )
                           );
-                          this.temp.push(
+                          this.importDeclarations.push(
                             t.variableDeclaration("var", [
                               t.variableDeclarator(
                                 t.identifier(id.name), // 这个名字需要记录
@@ -139,7 +125,7 @@ module.exports = declare((api, options, dirname) => {
                           source = `${source}.json`;
                         }
                         const identifierName = getID(id.name);
-                        this.temp.push(
+                        this.importDeclarations.push(
                           t.importDeclaration(
                             [
                               t.importDefaultSpecifier(
@@ -149,7 +135,7 @@ module.exports = declare((api, options, dirname) => {
                             t.stringLiteral(source)
                           )
                         );
-                        this.temp.push(
+                        this.importDeclarations.push(
                           t.variableDeclaration("var", [
                             t.variableDeclarator(
                               t.identifier(id.name), // 这个名字需要记录
@@ -165,9 +151,11 @@ module.exports = declare((api, options, dirname) => {
                     }
                   }
                 }
-              },
+              }
+            });
+            path.traverse({
               ExpressionStatement: path => {
-                if (!this.isTinytooljs) return;
+                if (!this.isTinytoolJS) return;
                 if (this.isExpressionStatementOver) return;
                 const { node, parent } = path;
                 if (!t.isCallExpression(node.expression)) return;
@@ -191,11 +179,10 @@ module.exports = declare((api, options, dirname) => {
                 this.isExpressionStatementOver = true;
               }
             });
+            if (this.importDeclarations.length) {
+              path.unshiftContainer("body", this.importDeclarations);
+            }
           }
-        },
-        exit(path) {
-          if (!this.isTinytooljs) return;
-          path.unshiftContainer("body", this.temp);
         }
       }
     }

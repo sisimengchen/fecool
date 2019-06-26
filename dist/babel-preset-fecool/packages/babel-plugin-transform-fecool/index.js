@@ -56,10 +56,9 @@ module.exports = declare(function (api, options) {
     },
     visitor: {
       CallExpression: {
-        enter: function enter(path, _ref) {
+        enter: function enter(path, state) {
           var _this = this;
 
-          var opts = _ref.opts;
           var node = path.node,
               parent = path.parent;
           var calleeName = node.callee.name;
@@ -160,8 +159,8 @@ module.exports = declare(function (api, options) {
         }
       },
       ExpressionStatement: {
-        exit: function exit(path, _ref2) {
-          var opts = _ref2.opts;
+        exit: function exit(path, _ref) {
+          var opts = _ref.opts;
           var node = path.node,
               parent = path.parent;
           if (!t.isAssignmentExpression(node.expression)) return;

@@ -2,10 +2,12 @@ const path = require("path");
 const fs = require("fs");
 const { getOptions } = require("../../config");
 const { printer } = require("../../util");
-const { template } = require("@babel/core");
+const babel = require("@babel/core");
 const generate = require("@babel/generator").default;
 
-const codeWrapper = template(`define("NAME",function(){return(function(d){var e=0;var f;var c;var a;function b(){if(e++>0){return}if(!f){f=document.head||document.getElementsByTagName("head")[0]}if(!c){var k=f.getElementsByTagName("link");for(var j=0,h=k.length;j<h;++j){if(k[j].rel==="stylesheet"){c=k[j];break}}}if(!a){a=document.createElement("style");c?f.insertBefore(a,c):f.appendChild(a);a.setAttribute("type","text/css");if(a.styleSheet){a.styleSheet.cssText=d}else{a.appendChild(document.createTextNode(d))}}else{c?f.insertBefore(a,c):f.appendChild(a)}}function g(){if(e===0){return}if(--e===0){f.removeChild(a)}}return{use:b,unuse:g}})("VALUE")});`);
+const codeWrapper = babel.template(
+  `define("NAME",function(){return(function(d){var e=0;var f;var c;var a;function b(){if(e++>0){return}if(!f){f=document.head||document.getElementsByTagName("head")[0]}if(!c){var k=f.getElementsByTagName("link");for(var j=0,h=k.length;j<h;++j){if(k[j].rel==="stylesheet"){c=k[j];break}}}if(!a){a=document.createElement("style");c?f.insertBefore(a,c):f.appendChild(a);a.setAttribute("type","text/css");if(a.styleSheet){a.styleSheet.cssText=d}else{a.appendChild(document.createTextNode(d))}}else{c?f.insertBefore(a,c):f.appendChild(a)}}function g(){if(e===0){return}if(--e===0){f.removeChild(a)}}return{use:b,unuse:g}})("VALUE")});`
+);
 
 const defaultOptions = {};
 
@@ -30,9 +32,27 @@ module.exports = function({ dependName, paramName, filename }, options) {
         VALUE: source
       });
       const code = generate(ast).code;
-      fs.writeFile(module.distFilename, code, "utf8", error => {
-        if (error) throw err;
-      });
+      if (getOptions().isDevelopENV()) {
+        fs.writeFile(module.distFilename, code, "utf8", error => {
+          if (error) throw err;
+        });
+      } else {
+        babel.transform(
+          code,
+          {
+            configFile: false,
+            babelrc: false,
+            minified: true,
+            compact: true
+          },
+          function(error, result) {
+            if (error) throw err;
+            fs.writeFile(module.distFilename, result.code, "utf8", error => {
+              if (error) throw err;
+            });
+          }
+        );
+      }
     }
   } catch (error) {
     printer.error(error);

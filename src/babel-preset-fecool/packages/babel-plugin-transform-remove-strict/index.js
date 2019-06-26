@@ -8,8 +8,8 @@ module.exports = declare(api => {
   return {
     name: "transform-remove-strict",
     visitor: {
-      Directive(path, { opts }) {
-        if (!path.hub.file.isTinytooljs) return;
+      Directive(path, state) {
+        if (!state.file.get("isTinytoolJS")) return;
         const { node, parent } = path;
         if (t.isDirectiveLiteral(node.value)) {
           node.value.value = "use strict";

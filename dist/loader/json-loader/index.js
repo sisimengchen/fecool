@@ -10,12 +10,11 @@ var _require = require("../../config"),
 var _require2 = require("../../util"),
     printer = _require2.printer;
 
-var _require3 = require("@babel/core"),
-    template = _require3.template;
+var babel = require("@babel/core");
 
 var generate = require("@babel/generator")["default"];
 
-var codeWrapper = template("\n  define('NAME', function() {\n    return JSON.parse('VALUE');\n  })\n");
+var codeWrapper = babel.template("\n  define('NAME', function() {\n    return JSON.parse('VALUE');\n  })\n");
 var defaultOptions = {
   minify: false
 };
@@ -52,9 +51,24 @@ module.exports = function (_ref, options) {
         JSON: "JSON"
       });
       var code = generate(ast).code;
-      fs.writeFile(module.distFilename, code, "utf8", function (error) {
-        if (error) throw err;
-      });
+
+      if (getOptions().isDevelopENV()) {
+        fs.writeFile(module.distFilename, code, "utf8", function (error) {
+          if (error) throw err;
+        });
+      } else {
+        babel.transform(code, {
+          configFile: false,
+          babelrc: false,
+          minified: true,
+          compact: true
+        }, function (error, result) {
+          if (error) throw err;
+          fs.writeFile(module.distFilename, result.code, "utf8", function (error) {
+            if (error) throw err;
+          });
+        });
+      }
     }
   } catch (error) {
     printer.error(error);

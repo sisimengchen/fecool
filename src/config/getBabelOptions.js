@@ -16,6 +16,8 @@ module.exports = function(
   isES6Enabled = isReactEnabled ? isReactEnabled : isES6Enabled;
   const babelOptions = {
     sourceType: "module",
+    configFile: false,
+    babelrc: false,
     compact: getOptions().isDevelopENV() ? false : true,
     minified: getOptions().isDevelopENV() ? false : true,
     comments: getOptions().isDevelopENV() ? true : false,

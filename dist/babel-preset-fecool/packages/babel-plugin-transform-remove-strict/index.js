@@ -12,9 +12,8 @@ module.exports = declare(function (api) {
   return {
     name: "transform-remove-strict",
     visitor: {
-      Directive: function Directive(path, _ref) {
-        var opts = _ref.opts;
-        if (!path.hub.file.isTinytooljs) return;
+      Directive: function Directive(path, state) {
+        if (!state.file.get("isTinytoolJS")) return;
         var node = path.node,
             parent = path.parent;
 

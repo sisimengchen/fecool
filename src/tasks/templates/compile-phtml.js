@@ -46,7 +46,8 @@ function phtmlCompile() {
           }
           try {
             const resourcePath = globalOptions.resolve(source, this.file.path);
-            source = resourcePath;
+            const module = globalOptions.getModule(resourcePath);
+            source = module.distFilename;
           } catch (error) {
           } finally {
             return `${p1}${source}${p3}`;

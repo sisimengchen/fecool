@@ -52,7 +52,10 @@ function phtmlCompile() {
 
     try {
       var resourcePath = globalOptions.resolve(source, this.file.path);
-      source = resourcePath;
+
+      var _module2 = globalOptions.getModule(resourcePath);
+
+      source = _module2.distFilename;
     } catch (error) {} finally {
       return "".concat(p1).concat(source).concat(p3);
     }

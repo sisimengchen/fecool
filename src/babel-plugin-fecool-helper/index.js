@@ -5,6 +5,8 @@ const t = types;
 
 const { getOptions } = require("../config");
 
+const globalOptions = getOptions();
+
 module.exports = declare((api, options, dirname) => {
   api.assertVersion(7);
   const { loose, allowTopLevelThis, strict, strictMode, noInterop } = options;
@@ -29,9 +31,8 @@ module.exports = declare((api, options, dirname) => {
             );
             return;
           } else if (
-            type === "CommentBlock" &&
-            value &&
-            value.trim() === "@tinytooljs"
+            globalOptions.tinytooljs ||
+            (type === "CommentBlock" && value && value.trim() === "@tinytooljs")
           ) {
             this.file.set("sourceType", "tinytooljs");
             return;

@@ -11,6 +11,7 @@ var t = types;
 var _require3 = require("../config"),
     getOptions = _require3.getOptions;
 
+var globalOptions = getOptions();
 module.exports = declare(function (api, options, dirname) {
   api.assertVersion(7);
   var loose = options.loose,
@@ -35,7 +36,7 @@ module.exports = declare(function (api, options, dirname) {
           if (type === "CommentBlock" && value && /^@sourcetype=/.test(value.trim())) {
             this.file.set("sourceType", value.trim().replace(/^@sourcetype=/, ""));
             return;
-          } else if (type === "CommentBlock" && value && value.trim() === "@tinytooljs") {
+          } else if (globalOptions.tinytooljs || type === "CommentBlock" && value && value.trim() === "@tinytooljs") {
             this.file.set("sourceType", "tinytooljs");
             return;
           } else {

@@ -23,7 +23,7 @@ const globalOptions = getOptions();
 function lessCompile() {
   return gulp
     .src(globalOptions.getGulpSrc("less"))
-    .pipe(changed(globalOptions.getGulpDest(), { extension: ".less.css" }))
+    .pipe(changed(globalOptions.getGulpDest(), { extension: ".css" }))
     .pipe(printer(filepath => `less编译任务 ${filepath}`))
     .pipe(gulpif(globalOptions.isDevelopENV(), sourcemaps.init())) // 开发环境生成sourcemap
     .pipe(less({ plugins: [resolveUrls] }))

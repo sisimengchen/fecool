@@ -21,7 +21,7 @@ const globalOptions = getOptions();
 function stylusCompile() {
   return gulp
     .src(globalOptions.getGulpSrc("styl"))
-    .pipe(changed(globalOptions.getGulpDest(), { extension: ".styl.css" }))
+    .pipe(changed(globalOptions.getGulpDest(), { extension: ".css" }))
     .pipe(printer(filepath => `styl编译任务 ${filepath}`))
     .pipe(
       stylus({

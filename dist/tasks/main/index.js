@@ -11,6 +11,5 @@ module.exports = {
   jsxCompile: require("../js/compile-jsx"),
   commonjsConcat: require("../js/common-concat"),
   htmlCompile: require("../templates/compile-html"),
-  phtmlCompile: require("../templates/compile-phtml"),
-  imageCompress: require("../image/compress")
+  phtmlCompile: require("../templates/compile-phtml")
 };

@@ -20,10 +20,9 @@ var _require3 = require("./index.js"),
     jsxCompile = _require3.jsxCompile,
     commonjsConcat = _require3.commonjsConcat,
     htmlCompile = _require3.htmlCompile,
-    phtmlCompile = _require3.phtmlCompile,
-    imageCompress = _require3.imageCompress;
+    phtmlCompile = _require3.phtmlCompile;
 
-var build = series(parallel(clean), parallel(move, moveExclude), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile), parallel(imageCompress), function (cb) {
+var build = series(parallel(clean), parallel(move, moveExclude), parallel(cssCompile, stylusCompile, lessCompile), parallel(jsCompile, jsxCompile, commonjsConcat), parallel(htmlCompile, phtmlCompile), function (cb) {
   printer.log("编译任务执行完毕");
   printer.timeEnd("编译任务执行时间");
   printer.time("打包任务执行时间");

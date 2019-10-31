@@ -18,7 +18,6 @@ const {
   commonjsConcat,
   htmlCompile,
   phtmlCompile,
-  imageCompress
 } = require("./index.js");
 
 const build = series(
@@ -27,7 +26,6 @@ const build = series(
   parallel(cssCompile, stylusCompile, lessCompile),
   parallel(jsCompile, jsxCompile, commonjsConcat),
   parallel(htmlCompile, phtmlCompile),
-  parallel(imageCompress),
   function(cb) {
     printer.log("编译任务执行完毕");
     printer.timeEnd("编译任务执行时间");

@@ -1,6 +1,7 @@
 node_modules/
 package-lock.json
 src
+doc
 test
 fecool.config.js
 dest

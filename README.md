@@ -2,6 +2,8 @@
 
 fecool 前端工程构建工具。解决前端工程中，资源加载、依赖管理，代码合并，资源压缩、模块化开发、代码部署、访问代理、mock 生成等问题。
 
+![fecool](doc/flow.png "fecool")
+
 ### 功能列表
 
 - javascript 代码支持 - 内置@babel/preset-env 支持编 es6 代码，支持资源内嵌，并生成 amd 包
@@ -155,3 +157,7 @@ fecool 内置 browser-sync + http-proxy-middleware，支持访问代理配置。
 
 当前版本的 fecool 同时支持 ejs 同步 mock 功能，当用开发服务器访问.ejs 资源的时候，把通目录下的 mock.ejsjson 文件作为 js 对象注入到 ejs 模板中。
 v0.0.19 版本的 fecool 支持 php 同步 mock 功能，当用开发服务器访问.php 资源的时候，把通目录下的 mock.phpjson 文件作为 php 对象注入到 php 模板中。
+
+### [注意事项](doc/attention.md)
+
+### [源码说明](doc/source.md)

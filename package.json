@@ -59,7 +59,7 @@
     "map-stream": "0.0.7",
     "mime": "2.4.4",
     "moment": "2.24.0",
-    "postcss": "7.0.27",
+    "postcss": "8.4.31",
     "postcss-preset-env": "6.7.0",
     "resolve": "1.15.1"
   },
